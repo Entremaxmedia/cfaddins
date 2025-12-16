@@ -72,18 +72,29 @@
     if (typeof jQuery === 'undefined') {
       // Vanilla JS fallback
       var radios = document.querySelectorAll(RADIO_SEL + '[value="' + id + '"]');
+      console.log('Product Row Hider: [Vanilla JS] Found ' + radios.length + ' radio(s) for product ID: ' + id);
       radios.forEach(function(radio) {
         radio.setAttribute('data-bump-hidden', '1');
         var row = radio.closest('.elOrderProductOptinProducts');
-        if (row) row.setAttribute('data-bump-hidden', '1');
+        if (row) {
+          row.setAttribute('data-bump-hidden', '1');
+          console.log('Product Row Hider: Hidden row for product ID: ' + id);
+        } else {
+          console.warn('Product Row Hider: No .elOrderProductOptinProducts row found for product ID: ' + id);
+        }
       });
     } else {
       // jQuery version
       var $r = $(RADIO_SEL + '[value="' + id + '"]');
+      console.log('Product Row Hider: [jQuery] Found ' + $r.length + ' radio(s) for product ID: ' + id);
       if ($r.length) {
         // Tag both the row and the input (belt & suspenders)
         $r.attr('data-bump-hidden', '1');
-        $r.closest('.elOrderProductOptinProducts').attr('data-bump-hidden', '1');
+        var $row = $r.closest('.elOrderProductOptinProducts');
+        $row.attr('data-bump-hidden', '1');
+        console.log('Product Row Hider: Hidden row for product ID: ' + id + ', row found: ' + ($row.length > 0));
+      } else {
+        console.warn('Product Row Hider: No radio input found for product ID: ' + id);
       }
     }
   }
@@ -92,7 +103,9 @@
    * Apply hiding to all configured products
    */
   function applyAll() {
+    console.log('Product Row Hider: Applying hides for ' + FORCE_HIDE_PRODS.length + ' product(s):', FORCE_HIDE_PRODS);
     FORCE_HIDE_PRODS.forEach(hideRowFor);
+    console.log('Product Row Hider: Hide application complete');
   }
   
   // ─────────────────────────────────────────────────────────────────────────
@@ -120,7 +133,9 @@
   // MutationObserver: Re-apply on any CF/CFPT rewrites
   // ─────────────────────────────────────────────────────────────────────────
   var container = document.querySelector('.elOrderProductOptions') || document.body;
+  console.log('Product Row Hider: Setting up MutationObserver on:', container.className || 'body');
   var mo = new MutationObserver(function () {
+    console.log('Product Row Hider: DOM mutation detected, re-applying hides...');
     applyAll();
   });
   mo.observe(container, { childList: true, subtree: true });

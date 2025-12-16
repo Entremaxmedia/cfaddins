@@ -1,0 +1,137 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     CLICKFUNNELS ORDER FORM FOOTER CODE
+     Order Form: [Your Funnel Name]
+     Last Updated: 2025-12-16
+     Repository: kratner/ace-media-cfaddins
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     PRODUCT ROW HIDER CONFIGURATION & LOADER
+     ───────────────────────────────────────────────────────────────────────── -->
+<script>
+// Products to hide from main order form (used as bump dropdown sources)
+window.FORCE_HIDE_PRODS = [
+  '5023738', '5023739',  // 8-Piece Trump Gift Set variants
+  '5023740', '5023741',  // American Eagle Gold Coin variants
+  '5023743', '5023744'   // Trump VIP Patriot Pack variants
+];
+</script>
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/product-row-hider.js"></script>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     BUMP SELECTOR CONFIGURATION & LOADER
+     ───────────────────────────────────────────────────────────────────────── -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-fx.css">
+
+<script>
+// Bump selector configuration
+window.BUMP_CONFIG = [
+  // Rush & Insure option (simple checkbox, no dropdown)
+  {
+    mainProductId: null,
+    associatedIds: [],
+    includeMainInDropdown: false,
+    defaultId: null,
+    defaultIndex: 0,
+    featuredText: '',
+    preSelected: false
+  },
+  // 8-Piece Trump Gift Set
+  {
+    mainProductId: '5023729',
+    associatedIds: ['5023738', '5023739'],
+    includeMainInDropdown: true,
+    defaultIndex: 2,
+    featuredText: '*BONUS!*',
+    preSelected: false
+  },
+  // American Eagle Gold Coin
+  {
+    mainProductId: '5023731',
+    associatedIds: ['5023740', '5023741'],
+    includeMainInDropdown: true,
+    defaultIndex: 3,
+    featuredText: '*HOT!*',
+    preSelected: false
+  },
+  // Trump VIP Patriot Pack
+  {
+    mainProductId: '5023733',
+    associatedIds: ['5023743', '5023744'],
+    includeMainInDropdown: true,
+    defaultIndex: 1,
+    featuredText: '*NOW!*',
+    preSelected: false
+  }
+];
+</script>
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-core.js"></script>
+
+<!-- Debug Script -->
+<script>
+// Debug: Check if bump selector initialized
+setTimeout(function() {
+  console.log('=== BUMP SELECTOR DEBUG ===');
+  console.log('BUMP_CONFIG defined:', typeof window.BUMP_CONFIG !== 'undefined');
+  console.log('BUMP_SELECTOR_INITIALIZED:', window.BUMP_SELECTOR_INITIALIZED);
+  console.log('jQuery loaded:', typeof jQuery !== 'undefined');
+  console.log('Number of .orderFormBump elements:', $('.orderFormBump').length);
+  console.log('Bump selector dropdowns found:', $('[data-title="bump-selector"]').length);
+  
+  // Check for expected product radio inputs
+  window.BUMP_CONFIG.forEach(function(cfg, i) {
+    if (cfg.mainProductId) {
+      var $radio = $('input[type="radio"][value="' + cfg.mainProductId + '"]');
+      console.log('Bump ' + i + ' (ID: ' + cfg.mainProductId + ') radio found:', $radio.length > 0);
+    }
+  });
+}, 2000);
+</script>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     AUTO-SELECT DEFAULT CORE PRODUCT ON PAGE LOAD
+     ───────────────────────────────────────────────────────────────────────── -->
+<script>
+$(window).bind("load", function() {
+  $("#bump_offer_5023727").trigger("click");
+});
+</script>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     CF PRO TOOLS ADD-INS
+     ───────────────────────────────────────────────────────────────────────── -->
+<!-- © 2024 CF Pro Tools | New Data replace -->
+<script src="https://cdn.cfptaddons.com/857cc6fd-86c3-4f1a-9aaf-900baf464ca1.js" name="New Data replace" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | USA Only Shipping -->
+<script src="https://cdn.cfptaddons.com/04fc9bfe-57c9-4c4b-8a15-45faedc53a9f.js" name="USA Only Shipping" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | Select Default Product -->
+<script src="https://cdn.cfptaddons.com/235ba1bc-33c4-49cf-975c-f1062d0c5dbb.js" name="[TEST] Trump 2nd Term Coin 5x Select Default Product" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | Best Seller Highlight -->
+<script src="https://cdn.cfptaddons.com/aedea5ab-38c7-4ddc-9787-26d1d0daf4b0.js" name="[TEST] Trump 2nd Term Coin 5X Best Seller Highlight" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | Order Summary -->
+<script src="https://cdn.cfptaddons.com/9cc8506d-bece-4e74-b9d4-b88f9a9b4d12.js" name="[TEST] Trump 2nd Term Coin Order Summary" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Multiple Bumps 1 -->
+<script src="https://cdn.cfptaddons.com/ac1a077a-3c8f-4dfd-b365-c7a346df100a.js" name="Multiple Bumps 1" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Bump Content 1 -->
+<script src="https://cdn.cfptaddons.com/705aaccb-72b1-4c56-89a8-61bc268a2f05.js" name="Bump Content 1" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Scroll To Error 1 -->
+<script src="https://cdn.cfptaddons.com/c6d8b58c-9db9-4a31-8db4-56588fc30e60.js" name="Scroll To Error 1" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | Rearrange Products -->
+<script src="https://cdn.cfptaddons.com/3181cf00-4d0a-4ece-ae12-cdc3d0311b5a.js" name="Trump 2nd Term Coin Rearrange Products" defer="defer"></script>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     FOTORAMA IMAGE GALLERY
+     ───────────────────────────────────────────────────────────────────────── -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script>
+
+<!-- End Footer Code -->

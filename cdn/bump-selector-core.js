@@ -67,12 +67,15 @@
     
     // Main initialization wrapped in jQuery ready and delay
     $(function () {
+      console.log('Bump Selector: jQuery ready, starting 3-second delay...');
       setTimeout(function () {
+        console.log('Bump Selector: Delay complete, beginning initialization');
         var isUpdatingBumpSelector = false;
         var currentSelections = {};
         
         // Use the externally defined configuration
         const BUMPS = window.BUMP_CONFIG;
+        console.log('Bump Selector: BUMPS config:', BUMPS);
         
         
         // ── 1) DERIVE RUNTIME FIELDS ─────────────────────────────────────────
@@ -201,9 +204,14 @@
         
         
         // ── 3) BUILD DROPDOWN WRAPPERS ───────────────────────────────────────
+        console.log('Bump Selector: Building dropdown wrappers...');
         BUMPS.forEach(function (cfg) {
           var ids = combinedIds(cfg);
-          if (!ids.length) return; // Nothing to build for simple bumps
+          console.log('Bump Selector: Bump ' + cfg.index + ' - Combined IDs:', ids);
+          if (!ids.length) {
+            console.log('Bump Selector: Bump ' + cfg.index + ' - No IDs, skipping dropdown build');
+            return; // Nothing to build for simple bumps
+          }
           
           var defIdx = resolveDefaultIndex(cfg, ids);
           var selectHtml = '<select data-title="bump-selector">';
@@ -228,9 +236,12 @@
         
         
         // ── 4) BIND TO VISIBLE CHECKBOX (CONTROLLER) ─────────────────────────
+        console.log('Bump Selector: Binding to visible checkboxes...');
         BUMPS.forEach(function (cfg) {
           cfg.$bump = findBumpContainerByCfg(cfg);
+          console.log('Bump Selector: Bump ' + cfg.index + ' - Found bump container:', cfg.$bump.length > 0);
           var $vis = cfg.$bump.find('input[type="checkbox"]').first();
+          console.log('Bump Selector: Bump ' + cfg.index + ' - Found checkbox:', $vis.length > 0);
           
           if (!$vis.length) {
             $vis = $('<input type="checkbox" value="1" />').prependTo(cfg.$bump);
@@ -244,12 +255,19 @@
         
         
         // ── 5) INJECT WRAPPERS INTO BUMP BOXES ───────────────────────────────
+        console.log('Bump Selector: Injecting wrappers into bump boxes...');
         BUMPS.forEach(function (cfg) {
-          if (!cfg.$wrap || !cfg.$wrap.length) return; // Skip simple bumps
+          if (!cfg.$wrap || !cfg.$wrap.length) {
+            console.log('Bump Selector: Bump ' + cfg.index + ' - No wrapper to inject');
+            return; // Skip simple bumps
+          }
           
           var $bump = cfg.$bump && cfg.$bump.length ? cfg.$bump : findBumpContainerByCfg(cfg);
+          console.log('Bump Selector: Bump ' + cfg.index + ' - Injecting into bump, found:', $bump.length > 0);
           var $first = $bump.find('.sectioncontent').children().first();
+          console.log('Bump Selector: Bump ' + cfg.index + ' - Found injection point:', $first.length > 0);
           $first.after(cfg.$wrap);
+          console.log('Bump Selector: Bump ' + cfg.index + ' - Wrapper injected');
         });
         
         
@@ -270,6 +288,7 @@
          * Activate a bump - show dropdown and select default
          */
         function activateBump(cfg) {
+          console.log('Bump Selector: Activating bump ' + cfg.index);
           var ids = combinedIds(cfg);
           
           if (cfg.$wrap && cfg.$wrap.length) {
@@ -504,6 +523,8 @@
         // Mark as initialized
         window.BUMP_SELECTOR_INITIALIZED = true;
         console.log('Bump Selector v1.3.0: Initialization complete');
+        console.log('Bump Selector: Total .orderFormBump elements found:', $('.orderFormBump').length);
+        console.log('Bump Selector: Total bump-selector dropdowns created:', $('[data-title="bump-selector"]').length);
         
       }, 3000); // 3-second delay to ensure Clickfunnels is ready
     });
