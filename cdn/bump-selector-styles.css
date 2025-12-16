@@ -1,0 +1,87 @@
+/*!
+ * Bump Selector with Dropdowns (CDN) — Styles v1.3.0 (2025-12-16)
+ * Styling for dropdown-based bump selectors in Clickfunnels order forms
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BUMP SELECTOR WRAPPER STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[class^="bump-selector-wrap"],
+[class*=" bump-selector-wrap"] {
+  margin: 0 0;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELECT DROPDOWN STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[class^="bump-selector-wrap"] select,
+[class*=" bump-selector-wrap"] select {
+  border: 2px solid #DAA520;
+  background-color: #FFFACD;
+  color: #8B4513;
+  font-weight: bold;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 10px 0;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Focus state for accessibility */
+[class^="bump-selector-wrap"] select:focus,
+[class*=" bump-selector-wrap"] select:focus {
+  outline: none;
+  box-shadow: 0 0 5px #DAA520;
+  border-color: #B8860B;
+}
+
+/* Hover state */
+[class^="bump-selector-wrap"] select:hover {
+  border-color: #B8860B;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUANTITY LABEL STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.quantity-selector-label {
+  display: block;
+  font-weight: bold;
+  color: #8B4513;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SELECT OPTION STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Keep long option text tidy */
+select {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Default/featured option emphasis */
+.default-option,
+.default-option-selected {
+  font-weight: 800 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ERROR STATE STYLING
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+[class^="bump-selector-wrap"] select.elInputError,
+[class*=" bump-selector-wrap"] select.elInputError {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+/* End Bump Selector with Dropdowns (CDN) — Styles v1.3.0 */
