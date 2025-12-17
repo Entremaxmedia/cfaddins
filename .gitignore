@@ -1,1 +1,12 @@
+# Windows system files
 desktop.ini
+Desktop.ini
+**/desktop.ini
+**/.git/objects/**/desktop.ini
+
+# Thumbnails
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+[Dd]esktop.ini
