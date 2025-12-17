@@ -3,29 +3,22 @@
      Order Form: [Your Funnel Name]
      Last Updated: 2025-12-16
      Repository: kratner/ace-media-cfaddins
+     
+     NOTE: This version uses the consolidated bump-selector-complete-core.js
+     which combines product hiding + bump selector functionality.
      ═══════════════════════════════════════════════════════════════════════════ -->
 
 <!-- ─────────────────────────────────────────────────────────────────────────
-     PRODUCT ROW HIDER CONFIGURATION & LOADER
-     ───────────────────────────────────────────────────────────────────────── -->
-<script>
-// Products to hide from main order form (used as bump dropdown sources)
-window.FORCE_HIDE_PRODS = [
-  '5023738', '5023739',  // 8-Piece Trump Gift Set variants
-  '5023740', '5023741',  // American Eagle Gold Coin variants
-  '5023743', '5023744'   // Trump VIP Patriot Pack variants
-];
-</script>
-<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/product-row-hider.js"></script>
-
-<!-- ─────────────────────────────────────────────────────────────────────────
-     BUMP SELECTOR CONFIGURATION & LOADER
+     BUMP SELECTOR COMPLETE CORE CONFIGURATION & LOADER
+     (Replaces both product-row-hider.js and bump-selector-core.js)
      ───────────────────────────────────────────────────────────────────────── -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-fx.css">
 
 <script>
-// Bump selector configuration
+// Bump selector configuration with automatic product hiding
+// associatedIds are automatically extracted and hidden on page load
+// No separate FORCE_HIDE_PRODS or product-row-hider.js needed
 window.BUMP_CONFIG = [
   // Rush & Insure option (simple checkbox, no dropdown)
   {
@@ -66,7 +59,9 @@ window.BUMP_CONFIG = [
   }
 ];
 </script>
-<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-core.js"></script>
+
+<!-- Consolidated bump selector + product hider script -->
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-complete-core.js"></script>
 
 <!-- ─────────────────────────────────────────────────────────────────────────
      AUTO-SELECT DEFAULT CORE PRODUCT ON PAGE LOAD
