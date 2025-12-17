@@ -1,0 +1,99 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     CLICKFUNNELS ORDER FORM FOOTER CODE
+     Order Form: DOD Coin with Hidden Product Upsell Popup
+     Last Updated: 2025-12-17
+     Repository: kratner/ace-media-cfaddins
+     
+     This version uses the CDN-hosted hidden-product-upsell-popup.js
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- Auto-select default product on page load -->
+<script>
+$(window).bind("load", function() {
+  $("#bump_offer_5009088").trigger("click");
+});
+</script>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     HIDDEN PRODUCT UPSELL POPUP CONFIGURATION
+     ───────────────────────────────────────────────────────────────────────── -->
+<script>
+// Configure upsell popup behavior
+window.UPSELL_CONFIG = {
+  // Product IDs to hide from main form (these are your upsell products)
+  hideProds: ['5022043'],
+  
+  // Map trigger products to their upsell replacements
+  // When customer selects 5009059, show popup offering 5022043
+  replaceMap: { 
+    '5009059': '5022043'
+  },
+  
+  // Optional: Hide additional products when specific upsell is accepted
+  // When customer accepts 5022043, also hide product 5009061
+  alsoHideOnUpsell: { 
+    '5022043': ['5009061']
+  },
+  
+  // Optional: Customize default button text
+  ctaDefaults: {
+    ctaYes: 'Yes, Upgrade My Order Now!',
+    ctaNo: "No, Thanks. I Don't Want This Upgrade"
+  },
+  
+  // Optional: Customize button colors
+  ctaColors: {
+    yesBg: 'rgb(18,183,0)',
+    yesText: '#ffffff',
+    yesSheen: 'rgba(255,255,255,.3)',
+    yesShadow: 'rgba(0,0,0,.12)',
+    noBg: 'red',
+    noText: 'white'
+  },
+  
+  // Optional: Per-upsell color overrides
+  ctaColorOverrides: {
+    // '5022043': { 
+    //   yesBg: '#28a745', 
+    //   yesText: '#fff', 
+    //   noText: '#666' 
+    // }
+  }
+};
+</script>
+
+<!-- Load Hidden Product Upsell Popup from CDN -->
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/hidden-product-upsell-popup.js"></script>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     CF PRO TOOLS ADD-INS
+     ───────────────────────────────────────────────────────────────────────── -->
+
+<!-- © 2025 CF Pro Tools | DOD Coin Rearrange Products -->
+<script src="https://cdn.cfptaddons.com/b29abaaa-924c-4bb2-b881-2bd2af7c8d92.js" name="DOD Coin Rearrange Products" defer="defer"></script>
+
+<!-- © 2023 CF Pro Tools | USA Only Shipping -->
+<script src="https://cdn.cfptaddons.com/04fc9bfe-57c9-4c4b-8a15-45faedc53a9f.js" name="USA Only Shipping" defer="defer"></script>
+
+<!-- © 2023 CF Pro Tools | Date Replace Pro With Math 1 -->
+<script src="https://cdn.cfptaddons.com/c30cfc5d-d4c4-4344-a465-73df78c531d2.js" name="Date Replace Pro With Math 1" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | DOD Coin | Default Selection -->
+<script src="https://cdn.cfptaddons.com/456820dc-643f-4a87-aafe-36962c093242.js" name="DOD Coin | Default Selection" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | DOD coin | Best Seller -->
+<script src="https://cdn.cfptaddons.com/a52db8e7-6250-46ad-b883-784f914a5f17.js" name="DOD coin | Best Seller" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | DOD Coin | Order Summary -->
+<script src="https://cdn.cfptaddons.com/2beef0c9-0a50-471a-aec7-a2114d5c117f.js" name="DOD Coin | Order Summary" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Multiple Bumps 1 -->
+<script src="https://cdn.cfptaddons.com/ac1a077a-3c8f-4dfd-b365-c7a346df100a.js" name="Multiple Bumps 1" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Bump Content 1 -->
+<script src="https://cdn.cfptaddons.com/705aaccb-72b1-4c56-89a8-61bc268a2f05.js" name="Bump Content 1" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Scroll To Error 1 -->
+<script src="https://cdn.cfptaddons.com/c6d8b58c-9db9-4a31-8db4-56588fc30e60.js" name="Scroll To Error 1" defer="defer"></script>
+
+<!-- End Footer Code -->
