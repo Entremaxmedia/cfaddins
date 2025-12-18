@@ -112,24 +112,16 @@
       bumpIndex++;
       console.log('[Bump Selector] Processing bump ' + bumpIndex + ' with mainProductId: ' + bumpConfig.mainProductId);
       
-      // Debug: Log what we're looking for and what exists
-      console.log('[Bump Selector] Looking for radio button with value: ' + bumpConfig.mainProductId);
-      console.log('[Bump Selector] Total radio buttons on page: ' + $('input[type="radio"]').length);
-      console.log('[Bump Selector] Radio button values:', $('input[type="radio"]').map(function() { return $(this).val(); }).get());
-      console.log('[Bump Selector] Total .orderFormBump sections: ' + $('.orderFormBump').length);
-
-      // Find the bump section by looking for radio button with matching product ID
-      var $bumpSection = $('input[type="radio"][value="' + bumpConfig.mainProductId + '"]')
-        .first()
-        .closest('.orderFormBump');
+      // Find the bump section by looking for checkbox with id="bump_offer_XXXXX"
+      var $bumpCheckbox = $('#bump_offer_' + bumpConfig.mainProductId);
+      var $bumpSection = $bumpCheckbox.closest('.orderFormBump');
 
       // Try associated IDs if main product not found
       if ($bumpSection.length === 0 && Array.isArray(bumpConfig.associatedIds)) {
         console.log('[Bump Selector] Main product not found, trying associatedIds:', bumpConfig.associatedIds);
         for (var i = 0; i < bumpConfig.associatedIds.length; i++) {
-          $bumpSection = $('input[type="radio"][value="' + bumpConfig.associatedIds[i] + '"]')
-            .first()
-            .closest('.orderFormBump');
+          $bumpCheckbox = $('#bump_offer_' + bumpConfig.associatedIds[i]);
+          $bumpSection = $bumpCheckbox.closest('.orderFormBump');
           if ($bumpSection.length) {
             console.log('[Bump Selector] Found bump section using associatedId: ' + bumpConfig.associatedIds[i]);
             break;
@@ -142,6 +134,8 @@
         console.warn('[Bump Selector] Searched for: main=' + bumpConfig.mainProductId + ', associated=' + JSON.stringify(bumpConfig.associatedIds));
         return;
       }
+      
+      console.log('[Bump Selector] Found bump section for product: ' + bumpConfig.mainProductId);
 
       // Create dropdown options
       var dropdownOptions = [];
