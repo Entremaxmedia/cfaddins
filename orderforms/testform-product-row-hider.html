@@ -1,0 +1,28 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     CLICKFUNNELS ORDER FORM FOOTER CODE
+     Order Form: Product Row Hider Demo
+     Last Updated: 2025-12-18
+     Repository: kratner/ace-media-cfaddins
+     
+     Purpose: Demonstrates product-row-hider.js functionality for hiding 
+              specific product variants from the main order form while 
+              keeping them available for other purposes (e.g., bump dropdowns)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     PRODUCT ROW HIDER CONFIGURATION
+     
+     Define product IDs to hide from the main order form. These products
+     remain accessible via bump dropdowns or other mechanisms, but won't
+     appear as selectable options in the primary product selection area.
+     ───────────────────────────────────────────────────────────────────────── -->
+<script>
+window.FORCE_HIDE_PRODS = [
+  '5023738', '5023739',  // 8-Piece Trump Gift Set - Size variants
+  '5023740', '5023741',  // American Eagle Gold Coin - Size variants  
+  '5023743', '5023744'   // Trump VIP Patriot Pack - Size variants
+];
+</script>
+
+<!-- Load Product Row Hider from CDN -->
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/product-row-hider.js"></script>
