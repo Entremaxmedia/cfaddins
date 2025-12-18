@@ -112,8 +112,23 @@
       bumpIndex++;
       console.log('[Bump Selector] Processing bump ' + bumpIndex + ' with mainProductId: ' + bumpConfig.mainProductId);
 
-      // Find the bump section
-      var $bumpSection = $('[data-title="' + bumpConfig.mainProductId + '"]').closest('.orderFormBump');
+      // Find the bump section by looking for radio button with matching product ID
+      var $bumpSection = $('input[type="radio"][value="' + bumpConfig.mainProductId + '"]')
+        .first()
+        .closest('.orderFormBump');
+
+      // Try associated IDs if main product not found
+      if ($bumpSection.length === 0 && Array.isArray(bumpConfig.associatedIds)) {
+        for (var i = 0; i < bumpConfig.associatedIds.length; i++) {
+          $bumpSection = $('input[type="radio"][value="' + bumpConfig.associatedIds[i] + '"]')
+            .first()
+            .closest('.orderFormBump');
+          if ($bumpSection.length) {
+            console.log('[Bump Selector] Found bump section using associatedId: ' + bumpConfig.associatedIds[i]);
+            break;
+          }
+        }
+      }
 
       if ($bumpSection.length === 0) {
         console.warn('[Bump Selector] Could not find bump section for mainProductId: ' + bumpConfig.mainProductId);
