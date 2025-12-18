@@ -252,6 +252,12 @@
             uncheckAllVariantIds(cfg, val);
             $('#cfAR [name="purchase[product_ids][]"][value="' + val + '"]').prop('checked', true);
           }
+        } else {
+          // Simple bump without dropdown - check product using checkbox value
+          var checkboxValue = cfg.$visibleChk.val();
+          if (checkboxValue) {
+            $('#cfAR [name="purchase[product_ids][]"][value="' + checkboxValue + '"]').prop('checked', true);
+          }
         }
 
         updateOrderSummary();
@@ -264,7 +270,15 @@
           $('#cfAR [name="purchase[product_ids][]"][value="' + cfg.currentValue + '"]').prop('checked', false);
           cfg.currentValue = '';
         }
-        if (cfg.$wrap && cfg.$wrap.length) cfg.$wrap.hide();
+        if (cfg.$wrap && cfg.$wrap.length) {
+          cfg.$wrap.hide();
+        } else {
+          // Simple bump without dropdown - uncheck product using checkbox value
+          var checkboxValue = cfg.$visibleChk.val();
+          if (checkboxValue) {
+            $('#cfAR [name="purchase[product_ids][]"][value="' + checkboxValue + '"]').prop('checked', false);
+          }
+        }
         updateOrderSummary();
       }
 
@@ -352,16 +366,20 @@
                 $('#cfAR [name="purchase[product_ids][]"][value="' + saved.value + '"]').prop('checked', true);
               }
             } else {
-              // Simple bump without dropdown - restore the main product checkbox
-              if (cfg.mainProductId) {
-                $('#cfAR [name="purchase[product_ids][]"][value="' + cfg.mainProductId + '"]').prop('checked', true);
+              // Simple bump without dropdown - get product ID from checkbox value
+              var checkboxValue = $chk.val();
+              if (checkboxValue) {
+                $('#cfAR [name="purchase[product_ids][]"][value="' + checkboxValue + '"]').prop('checked', true);
               }
             }
           } else {
             if (cfg.$wrap && cfg.$wrap.length) cfg.$wrap.hide();
             // Uncheck simple bump if not checked
-            if (!cfg.$wrap.length && cfg.mainProductId) {
-              $('#cfAR [name="purchase[product_ids][]"][value="' + cfg.mainProductId + '"]').prop('checked', false);
+            if (!cfg.$wrap.length) {
+              var checkboxValue = $chk.val();
+              if (checkboxValue) {
+                $('#cfAR [name="purchase[product_ids][]"][value="' + checkboxValue + '"]').prop('checked', false);
+              }
             }
           }
           cfg.currentValue = saved.value || '';
