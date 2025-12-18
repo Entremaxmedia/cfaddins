@@ -345,14 +345,24 @@
           $chk.prop('checked', saved.checked);
           if (saved.checked) {
             if (cfg.$wrap && cfg.$wrap.length) {
+              // Bump with dropdown
               cfg.$wrap.show();
               $sel.val(saved.value);
-            }
-            if (saved.value) {
-              $('#cfAR [name="purchase[product_ids][]"][value="' + saved.value + '"]').prop('checked', true);
+              if (saved.value) {
+                $('#cfAR [name="purchase[product_ids][]"][value="' + saved.value + '"]').prop('checked', true);
+              }
+            } else {
+              // Simple bump without dropdown - restore the main product checkbox
+              if (cfg.mainProductId) {
+                $('#cfAR [name="purchase[product_ids][]"][value="' + cfg.mainProductId + '"]').prop('checked', true);
+              }
             }
           } else {
             if (cfg.$wrap && cfg.$wrap.length) cfg.$wrap.hide();
+            // Uncheck simple bump if not checked
+            if (!cfg.$wrap.length && cfg.mainProductId) {
+              $('#cfAR [name="purchase[product_ids][]"][value="' + cfg.mainProductId + '"]').prop('checked', false);
+            }
           }
           cfg.currentValue = saved.value || '';
         });
