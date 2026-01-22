@@ -1,42 +1,44 @@
-/**
- * BUMP SELECTOR COMPLETE CORE v2.0
- * Based on original working Bump Selector v1.2.5
- * Consolidated script combining product hiding and bump selector functionality
+/*!
+ * Bump Selector with Dropdowns — v1.2.7 (2026-01-22 CDN)
+ * FIXES:
+ * - Fixed preselected bumps not appearing in order summary on initial page load
+ *   when using CFProTools Order Summary add-in (forces rebuild after initialization)
+ * - Fixed bump products disappearing when core product selection changes
+ * - Fixed blank space at top of order form (uses data-bump-hidden attribute)
  * 
- * Configuration: window.BUMP_CONFIG
- * - Automatically extracts and hides all associatedIds on page load
- * - Renders bump selector dropdowns for each bump configuration
- * - Dropdowns only visible when bump checkbox is checked
- * - No separate FORCE_HIDE_PRODS or product-row-hider.js needed
+ * Previous changes from v1.2.6:
+ * - Added robust order summary monitoring to prevent bumps from disappearing
+ * - Extended restore delay and added multiple rebuild calls to ensure proper sync
+ * - Added debouncing to prevent excessive rebuilds during rapid changes
+ * - Force order summary rebuild after all restoration is complete
  * 
- * © 2025 Ace Media
+ * Previous changes from v1.2.5:
+ * - Bump checkbox click handling is deferred with setTimeout(...,0) so our
+ *   activate/deactivate logic runs AFTER any other click handlers (e.g. CFPT
+ *   scripts that auto-check the first product). This ensures only the chosen
+ *   variant remains checked in product_ids[] and avoids the "first item + default"
+ *   double-selection in the order summary.
+ * - Retains uncheckAllVariantIds to keep each bump exclusive.
+ * - Still only builds cfg.$wrap when there are variant ids.
  */
+$(function () {
+  setTimeout(function () {
+    var isUpdatingBumpSelector = false;
+    var currentSelections = {};
+    var summaryRebuildTimeout = null;
 
-(function($) {
-  'use strict';
+    // Validate configuration
+    if (typeof window.BUMP_CONFIG === 'undefined') {
+      console.error('[Bump Selector] window.BUMP_CONFIG is not defined. Aborting initialization.');
+      return;
+    }
 
-  // Guard against multiple initializations
-  if (window.BUMP_SELECTOR_INITIALIZED) {
-    console.warn('[Bump Selector] Already initialized. Skipping duplicate initialization.');
-    return;
-  }
-  window.BUMP_SELECTOR_INITIALIZED = true;
+    if (!Array.isArray(window.BUMP_CONFIG)) {
+      console.error('[Bump Selector] window.BUMP_CONFIG must be an array. Aborting initialization.');
+      return;
+    }
 
-  // ═══════════════════════════════════════════════════════════════════════════════
-  // CONFIGURATION VALIDATION
-  // ═══════════════════════════════════════════════════════════════════════════════
-
-  if (typeof window.BUMP_CONFIG === 'undefined') {
-    console.error('[Bump Selector] window.BUMP_CONFIG is not defined. Aborting initialization.');
-    return;
-  }
-
-  if (!Array.isArray(window.BUMP_CONFIG)) {
-    console.error('[Bump Selector] window.BUMP_CONFIG must be an array. Aborting initialization.');
-    return;
-  }
-
-  console.log('[Bump Selector] Initializing with ' + window.BUMP_CONFIG.length + ' bump configurations.');
+    console.log('[Bump Selector v1.2.7] Initializing with ' + window.BUMP_CONFIG.length + ' bump configurations.');
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // EXTRACT AND HIDE PRODUCTS
