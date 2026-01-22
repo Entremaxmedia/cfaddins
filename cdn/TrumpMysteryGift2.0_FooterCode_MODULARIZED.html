@@ -1,0 +1,144 @@
+<!-- ========================================================================================
+   Trump Mystery Gift 2.0 — Modularized Footer Code
+   
+   This version uses external CDN modules from entremaxmedia/cfaddins:
+   - Product Row Hider (product-row-hider.js)
+   - Bump Selector (bump-selector-complete-core-v2.js)
+   - Hidden Product Upsell Popup (hidden-product-upsell-popup.js)
+   
+   Configuration is defined locally, then scripts are loaded from CDN.
+   ======================================================================================== -->
+
+<!-- Bump Selector Configuration & Script -->
+<script>
+  window.BUMP_CONFIG = [
+      // Expedite My Order — mainProductId: 4928463 (preselected bump that was disappearing)
+      {
+        mainProductId: '4928463',
+        associatedIds: [],
+        includeMainInDropdown: false,
+        defaultId: null,
+        defaultIndex: 0,
+        featuredText: '',
+        preSelected: true 
+      },
+      // 8-Piece Trump Gift Set
+      {
+        mainProductId: '4928461',
+        associatedIds: ['5023571','5023577','5023578'],
+        includeMainInDropdown: true,
+        defaultIndex: 2,
+        featuredText: '*NOW!*',
+        preSelected: false
+      },
+      // Trump Gold/Silver Set
+      {
+        mainProductId: '4928462',
+        associatedIds: ['5023592','5023595','5023597'],
+        includeMainInDropdown: true,
+        defaultIndex: 3,
+        featuredText: '*DEAL!*',
+        preSelected: false
+      },
+      // Trump Combat Knife
+      {
+        mainProductId: '4951047',
+        associatedIds: ['5023603','5023606','5023608'],
+        includeMainInDropdown: true,
+        defaultIndex: 1,
+        featuredText: '*SAVE!*',
+        preSelected: false   
+      },
+      // Trump VIP Patriot Pack
+      {
+        mainProductId: '5022368',
+        associatedIds: ['5023612','5023613'],
+        includeMainInDropdown: true,
+        defaultIndex: 1,
+        featuredText: '*EXCLUSIVE!*',
+        preSelected: false   
+      }
+    ];
+</script>
+<script src="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/bump-selector-complete-core-v2.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/bump-selector-styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/bump-selector-fx.css">
+
+<!-- Hidden Product Upsell Popup Configuration & Script -->
+<script>
+  window.UPSELL_CONFIG = {
+    hideProds: ['5022459'],               // hidden upsell product(s)
+    replaceMap: { '4928428': '5022459' }, // trigger → upsell
+    alsoHideOnUpsell: { '4928428': ['4928435'] },  // TRIGGER ID → extra products to hide
+    ctaDefaults: {
+      ctaYes: 'Yes, Upgrade My Order Now!',
+      ctaNo:  "No, Thanks. I Don't Want This Upgrade"
+    },
+    ctaColors: {
+      yesBg: 'rgb(18,183,0)',
+      yesText: '#ffffff',
+      yesSheen: 'rgba(255,255,255,.3)',
+      yesShadow: 'rgba(0,0,0,.12)',
+      noBg: 'red',
+      noText: 'white'
+    },
+    ctaColorOverrides: {}
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/hidden-product-upsell-popup.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/hidden-product-upsell-popup.css">
+
+<!-- Facebook Pixel Tracking -->
+<script>
+  comet('view_content');
+</script>
+
+<!-- ATC Tracking -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var buttons = document.querySelectorAll('[data-title="cfps-fb-track-vb-AddToCart"]');
+    buttons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        comet('add_to_cart');
+      });
+    });
+  });
+</script>
+
+<!-- Initiate Checkout Tracking -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var initiateCheckoutFired = false;
+    var buttons = document.querySelectorAll('a[href*="submit-form"]');
+    buttons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        if (!initiateCheckoutFired) {
+          comet('initiate_checkout');
+          initiateCheckoutFired = true;
+        }
+      });
+    });
+  });
+</script>
+
+<!-- CF Pro Tools Scripts -->
+<!-- © 2025 CF Pro Tools | Trump Mystery Gift 2.0 5x Default Selection -->
+<script src="https://cdn.cfptaddons.com/f0e6f404-e6f6-4a84-805e-5effb372537e.js" name="Trump Mystery Gift 2.0 5x Default Selection" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | Trump Mystery Gift 2.0 5x Best Seller Highlight -->
+<script src="https://cdn.cfptaddons.com/bc29a36f-2e33-4e22-a9df-56afe10bd84a.js" name="Trump Mystery Gift 2.0 5x Best Seller Highlight" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | Trump Mystery Gift 2.0 | Order Summary -->
+<script src="https://cdn.cfptaddons.com/91f7caec-762a-4988-a0c6-60e82de3cf52.js" name="Trump Mystery Gift 2.0 | Order Summary" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Multiple Bumps 1 -->
+<script src="https://cdn.cfptaddons.com/ac1a077a-3c8f-4dfd-b365-c7a346df100a.js" name="Multiple Bumps 1" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Bump Content 1 -->
+<script src="https://cdn.cfptaddons.com/705aaccb-72b1-4c56-89a8-61bc268a2f05.js" name="Bump Content 1" defer="defer"></script>
+
+<!-- © 2024 CF Pro Tools | Scroll To Error 1 -->
+<script src="https://cdn.cfptaddons.com/c6d8b58c-9db9-4a31-8db4-56588fc30e60.js" name="Scroll To Error 1" defer="defer"></script>
+
+<!-- © 2025 CF Pro Tools | Trump Mystery Gift 2.0 Rearrange Products -->
+<script src="https://cdn.cfptaddons.com/442f6e04-dec0-4b1b-a8d9-10cd71b11a04.js" name="Trump Mystery Gift 2.0 Rearrange Products" defer="defer"></script>
