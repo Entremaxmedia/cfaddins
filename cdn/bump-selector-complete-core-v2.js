@@ -64,10 +64,16 @@
     }
     console.log('[Bump Selector] Hiding ' + hideProducts.length + ' product rows...');
     hideProducts.forEach(function(productId) {
-      var $productRow = $('input:radio[value="' + productId + '"]').closest('.elOrderProductOptinProductName');
-      if ($productRow.length) {
-        $productRow.hide();
-        console.log('[Bump Selector] Hidden product: ' + productId);
+      var $radio = $('input:radio[value="' + productId + '"]');
+      if ($radio.length) {
+        // Set attribute on the radio input itself
+        $radio.attr('data-bump-hidden', '1');
+        // Also set on parent row for CSS targeting
+        var $productRow = $radio.closest('.elOrderProductOptinProducts');
+        if ($productRow.length) {
+          $productRow.attr('data-bump-hidden', '1');
+          console.log('[Bump Selector] Hidden product: ' + productId);
+        }
       }
     });
   }
