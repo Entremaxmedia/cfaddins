@@ -1,0 +1,587 @@
+// ClickFunnels Classic Stats Extractor v14
+// 
+// Uses the actual DOM structure and icon classes for accurate detection
+// Shows average units per order for EACH order form
+// NOW INCLUDES TOTAL REVENUE
+// NOW INCLUDES OPTINS PER SALE for each order form
+// FIXED: Same product names on different order forms now counted separately
+// FIXED: "Rush and Insure", "Protection Plan" etc excluded as non-physical
+// FIXED: "Buy X Get Y FREE" patterns now calculate total units correctly
+// FIXED: Archived products with same name now AGGREGATE instead of being skipped
+//
+// HOW TO USE:
+// 1. Go to your ClickFunnels funnel stats page
+// 2. Make sure all rows are expanded (click the arrows to show all products)
+// 3. Open browser developer console (F12 or right-click > Inspect > Console)
+// 4. Paste this entire script and press Enter
+// 5. Copy the output and paste it to Claude
+
+(function() {
+    const results = {
+        funnelName: '',
+        orderForms: [],
+        products: [],
+        upsells: [],
+        unclear: [],
+        excluded: []
+    };
+
+    // Track state
+    let seenProducts = new Set();
+    let currentContext = 'main'; // 'main' or 'upsell'
+    let currentOrderForm = null; // Track which order form we're under
+
+    // Get funnel name from the header
+    const funnelNameEl = document.querySelector('h3.truncated');
+    if (funnelNameEl) {
+        results.funnelName = funnelNameEl.textContent.trim();
+    }
+
+    // NEW: Get total revenue from the Gross Sales card in the header
+    const getTotalRevenueFromHeader = () => {
+        const grossSalesEl = document.querySelector('[data-stat-name="net_earnings"]');
+        if (grossSalesEl) {
+            const value = grossSalesEl.getAttribute('title') || grossSalesEl.textContent;
+            return parseFloat(value.replace(/[$,]/g, '')) || 0;
+        }
+        return null;
+    };
+
+    // Helper: Extract quantity from product name
+    const extractQuantity = (name) => {
+        const cleanName = name.trim();
+        
+        // "Buy X and Get Y FREE" pattern - total is X + Y
+        const buyGetFree = cleanName.match(/buy\s*(\d+).*?get\s*(\d+)\s*free/i);
+        if (buyGetFree) return parseInt(buyGetFree[1]) + parseInt(buyGetFree[2]);
+        
+        // "Pay shipping for X and get Y FREE - Z Products" - use Z if present
+        const payShipTotal = cleanName.match(/pay\s*shipping.*?-\s*(\d+)\s+/i);
+        if (payShipTotal) return parseInt(payShipTotal[1]);
+        
+        // "Pay shipping for X and get Y FREE" - total is X + Y
+        const payShipGetFree = cleanName.match(/pay\s*shipping\s*for\s*(\d+).*?get\s*(\d+)\s*free/i);
+        if (payShipGetFree) return parseInt(payShipGetFree[1]) + parseInt(payShipGetFree[2]);
+        
+        // Pattern priority for standard formats:
+        const parenStart = cleanName.match(/^\((\d+)\)/);
+        if (parenStart) return parseInt(parenStart[1]);
+        
+        const pieceMatch = cleanName.match(/(\d+)[\s-]*piece/i);
+        if (pieceMatch) return parseInt(pieceMatch[1]);
+        
+        const parenEnd = cleanName.match(/\((\d+)\s*(coin|bar|item|piece|bill)/i);
+        if (parenEnd) return parseInt(parenEnd[1]);
+        
+        const dashX = cleanName.match(/^(\d+)[\s]*[-x][\s]*/i);
+        if (dashX) return parseInt(dashX[1]);
+        
+        const numSpace = cleanName.match(/^(\d+)\s+[A-Za-z]/);
+        if (numSpace) return parseInt(numSpace[1]);
+        
+        const dashMiddle = cleanName.match(/-\s*(\d+)\s+[A-Za-z]/);
+        if (dashMiddle) return parseInt(dashMiddle[1]);
+        
+        const xDollar = cleanName.match(/(\d+)x\s*\$/i);
+        if (xDollar) return parseInt(xDollar[1]);
+        
+        return 1;
+    };
+
+    // Helper: Check if non-physical
+    const isNonPhysical = (name) => {
+        const lower = name.toLowerCase();
+        return (
+            lower === 'shipping' ||
+            lower.includes('mytacticalperks') ||
+            lower.includes('mytactical perks') ||
+            (lower.includes('tactical') && lower.includes('perk')) ||
+            lower.includes('rush and insure') ||
+            lower.includes('rush & insure') ||
+            lower.includes('insure my order') ||
+            lower.includes('expedite my order') ||
+            lower.includes('protection plan')
+        );
+    };
+
+    // Helper: Check if product needs clarification
+    const isUnclear = (name) => {
+        const lower = name.toLowerCase();
+        const reasons = [];
+
+        if (lower.includes('bundle') && !name.match(/^(\d+)[\s-]/)) {
+            reasons.push('Bundle - unclear how many physical items');
+        }
+
+        if (lower.includes('membership') && !lower.includes('mytacticalperks')) {
+            reasons.push('Membership combo - confirm physical item count');
+        }
+
+        if ((lower.includes('masterpack') || lower.includes(' pack')) && 
+            !name.match(/(\d+)\s*(coin|item|piece)/i) && 
+            !name.match(/^(\d+)[\s-]/)) {
+            reasons.push('Pack/Masterpack - unclear how many physical items');
+        }
+
+        if (lower.includes('gift set') && !name.match(/(\d+)[\s-]*piece/i)) {
+            reasons.push('Gift set - unclear how many physical items');
+        }
+
+        if (lower.includes('mystery')) {
+            reasons.push('Mystery item - unclear what physical product(s)');
+        }
+
+        if (lower.includes(' set') && !lower.includes('gift set') && !name.match(/(\d+)[\s-]*(piece|pc)/i)) {
+            reasons.push('Set - unclear how many physical items');
+        }
+
+        return reasons;
+    };
+
+    // Helper: Get icon type from a row
+    const getIconType = (row) => {
+        const titleCell = row.querySelector('.title-cell');
+        if (!titleCell) return null;
+        
+        const icons = titleCell.querySelectorAll('i');
+        for (const icon of icons) {
+            const classes = icon.className;
+            if (classes.includes('shopping') && classes.includes('cart')) return 'cart';
+            if (classes.includes('arrow') && classes.includes('up')) return 'upsell';
+            if (classes.includes('cube')) return 'product';
+            if (classes.includes('flag')) return 'page';
+        }
+        
+        return null;
+    };
+
+    // Helper: Get row name
+    const getRowName = (row) => {
+        const titleCell = row.querySelector('.title-cell');
+        if (!titleCell) return null;
+        return titleCell.textContent.trim();
+    };
+
+    // Helper: Get stats from a row
+    const getRowStats = (row) => {
+        const salesCountCell = row.querySelector('[data-stat-name="sales_count"]');
+        const salesValueCell = row.querySelector('[data-stat-name="sales_value"]');
+        const optinsCountCell = row.querySelector('[data-stat-name="optins_count"]');
+        
+        let salesCount = 0;
+        let salesValue = 0;
+        let optinsCount = 0;
+        
+        if (salesCountCell) {
+            const text = salesCountCell.textContent.trim();
+            salesCount = parseInt(text.replace(/[^0-9]/g, '')) || 0;
+        }
+        
+        if (salesValueCell) {
+            const text = salesValueCell.textContent.trim();
+            salesValue = parseFloat(text.replace(/[$,]/g, '')) || 0;
+        }
+        
+        if (optinsCountCell) {
+            const text = optinsCountCell.textContent.trim();
+            optinsCount = parseInt(text.replace(/[^0-9]/g, '')) || 0;
+        }
+        
+        return { salesCount, salesValue, optinsCount };
+    };
+
+    // Find all table rows
+    const rows = document.querySelectorAll('tr');
+    
+    rows.forEach((row) => {
+        const iconType = getIconType(row);
+        if (!iconType) return;
+        
+        const name = getRowName(row);
+        if (!name) return;
+        
+        const { salesCount, salesValue, optinsCount } = getRowStats(row);
+        
+        // Handle based on icon type
+        switch (iconType) {
+            case 'cart':
+                // Order form - create new order form entry
+                const isAbandon = name.toLowerCase().includes('abandon');
+                const orderForm = {
+                    name: name,
+                    orders: salesCount,
+                    revenue: salesValue,
+                    optins: optinsCount,
+                    optinsPerSale: salesCount > 0 ? (optinsCount / salesCount).toFixed(2) : '0.00',
+                    type: isAbandon ? 'abandon' : 'main',
+                    productUnits: 0,  // Will accumulate units from products
+                    productCount: 0   // Count of product line items
+                };
+                results.orderForms.push(orderForm);
+                currentOrderForm = orderForm;
+                currentContext = 'main';
+                break;
+                
+            case 'upsell':
+                // Upsell page - switch context, clear current order form
+                currentContext = 'upsell';
+                currentOrderForm = null;
+                break;
+                
+            case 'page':
+                // Page within order form - keep current context
+                break;
+                
+            case 'product':
+                if (salesCount === 0) return;
+                
+                // Normalize name for aggregation (same product with archived versions should combine)
+                const normalizedName = name.toLowerCase()
+                    .replace(/\(archived\)/g, '')
+                    .replace(/\*+[^*]+\*+/g, '')
+                    .replace(/\(recommended\)/g, '')
+                    .replace(/\(discounted\)/g, '')
+                    .replace(/\$[\d.]+/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                
+                // Create unique key combining product name + order form + context
+                const orderFormKey = currentOrderForm ? currentOrderForm.name : (currentContext === 'upsell' ? '__upsell__' : '__unknown__');
+                const dedupeKey = `${normalizedName}|||${orderFormKey}`;
+
+                // Check if non-physical FIRST (before any aggregation)
+                if (isNonPhysical(name)) {
+                    // For non-physical, check if we already have this in excluded
+                    const existingExcluded = results.excluded.find(e => 
+                        e.name.toLowerCase().replace(/\(archived\)/g, '').trim() === 
+                        name.toLowerCase().replace(/\(archived\)/g, '').trim()
+                    );
+                    if (existingExcluded) {
+                        existingExcluded.sales += salesCount;
+                        existingExcluded.revenue += salesValue;
+                    } else {
+                        results.excluded.push({
+                            name: name,
+                            sales: salesCount,
+                            revenue: salesValue,
+                            reason: 'Non-physical (membership/service)'
+                        });
+                    }
+                    return;
+                }
+
+                const unclearReasons = isUnclear(name);
+                const quantity = extractQuantity(name);
+                const units = salesCount * quantity;
+
+                // Check if we've seen this product before - if so, AGGREGATE instead of skip
+                if (seenProducts.has(dedupeKey)) {
+                    // Find existing product and add to it
+                    let targetArray;
+                    if (unclearReasons.length > 0) {
+                        targetArray = results.unclear;
+                    } else if (currentContext === 'upsell') {
+                        targetArray = results.upsells;
+                    } else {
+                        targetArray = results.products;
+                    }
+                    
+                    const existingProduct = targetArray.find(p => {
+                        const pNormalized = p.name.toLowerCase()
+                            .replace(/\(archived\)/g, '')
+                            .replace(/\*+[^*]+\*+/g, '')
+                            .replace(/\(recommended\)/g, '')
+                            .replace(/\(discounted\)/g, '')
+                            .replace(/\$[\d.]+/g, '')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                        const pOrderForm = p.orderFormName || (p.context === 'upsell' ? '__upsell__' : '__unknown__');
+                        return pNormalized === normalizedName && pOrderForm === orderFormKey;
+                    });
+                    
+                    if (existingProduct) {
+                        // Aggregate: add sales, units, revenue
+                        existingProduct.sales += salesCount;
+                        existingProduct.units += units;
+                        existingProduct.revenue += salesValue;
+                        
+                        // Also add to order form units if in main context
+                        if (currentContext === 'main' && currentOrderForm) {
+                            currentOrderForm.productUnits += units;
+                        }
+                    }
+                    return;
+                }
+                
+                // First time seeing this product - add it
+                seenProducts.add(dedupeKey);
+                
+                const productData = {
+                    name: name,
+                    sales: salesCount,
+                    quantity: quantity,
+                    units: units,
+                    revenue: salesValue,
+                    context: currentContext,
+                    orderFormName: currentOrderForm ? currentOrderForm.name : null
+                };
+
+                // Add units to current order form if we're in main context
+                if (currentContext === 'main' && currentOrderForm) {
+                    currentOrderForm.productUnits += units;
+                    currentOrderForm.productCount++;
+                }
+
+                if (unclearReasons.length > 0) {
+                    productData.unclearReasons = unclearReasons;
+                    results.unclear.push(productData);
+                } else if (currentContext === 'upsell') {
+                    results.upsells.push(productData);
+                } else {
+                    results.products.push(productData);
+                }
+                break;
+        }
+    });
+
+    // Calculate totals
+    const totalOrders = results.orderForms.reduce((sum, f) => sum + f.orders, 0);
+    const mainOrders = results.orderForms.filter(f => f.type === 'main').reduce((sum, f) => sum + f.orders, 0);
+    const abandonOrders = results.orderForms.filter(f => f.type === 'abandon').reduce((sum, f) => sum + f.orders, 0);
+    const mainUnits = results.products.reduce((sum, p) => sum + p.units, 0);
+    const upsellUnits = results.upsells.reduce((sum, p) => sum + p.units, 0);
+    const unclearUnits = results.unclear.reduce((sum, p) => sum + p.units, 0);
+    const totalUnits = mainUnits + upsellUnits;
+    const mainForms = results.orderForms.filter(f => f.type === 'main');
+    const abandonForms = results.orderForms.filter(f => f.type === 'abandon');
+
+    // NEW: Calculate revenue totals
+    const headerRevenue = getTotalRevenueFromHeader();
+    const mainFormRevenue = mainForms.reduce((sum, f) => sum + f.revenue, 0);
+    const abandonFormRevenue = abandonForms.reduce((sum, f) => sum + f.revenue, 0);
+    const mainProductRevenue = results.products.reduce((sum, p) => sum + p.revenue, 0);
+    const upsellRevenue = results.upsells.reduce((sum, p) => sum + p.revenue, 0);
+    const unclearRevenue = results.unclear.reduce((sum, p) => sum + p.revenue, 0);
+    
+    // Use header revenue if available (most accurate), otherwise calculate from order forms
+    const totalRevenue = headerRevenue !== null ? headerRevenue : (mainFormRevenue + abandonFormRevenue);
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    // Format output
+    let output = `
+================================================================================
+CLICKFUNNELS STATS EXPORT v14
+================================================================================
+FUNNEL: ${results.funnelName || '(Unknown)'}
+
+================================================================================
+ORDER FORMS (${results.orderForms.length} found)
+================================================================================
+`;
+
+    if (mainForms.length > 0) {
+        output += `\nMAIN ORDER FORMS:\n`;
+        mainForms.forEach(item => {
+            const avgUnits = item.orders > 0 ? (item.productUnits / item.orders).toFixed(2) : '0.00';
+            output += `  ${item.name}\n`;
+            output += `    Orders: ${item.orders} | Revenue: $${item.revenue.toFixed(2)} | Units: ${item.productUnits} | Avg Units/Order: ${avgUnits}\n`;
+            output += `    Optins: ${item.optins} | Optins/Sale: ${item.optinsPerSale}\n`;
+        });
+        const mainTotalUnits = mainForms.reduce((sum, f) => sum + f.productUnits, 0);
+        const mainTotalOptins = mainForms.reduce((sum, f) => sum + f.optins, 0);
+        const mainAvgUnits = mainOrders > 0 ? (mainTotalUnits / mainOrders).toFixed(2) : '0.00';
+        const mainOptinsPerSale = mainOrders > 0 ? (mainTotalOptins / mainOrders).toFixed(2) : '0.00';
+        output += `  ─────────────────────────────────────────────────────────────────\n`;
+        output += `  Subtotal: ${mainOrders} orders | $${mainFormRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} revenue | ${mainTotalUnits} units | Avg: ${mainAvgUnits} units/order\n`;
+        output += `  Subtotal Optins: ${mainTotalOptins} | Optins/Sale: ${mainOptinsPerSale}\n`;
+    }
+    
+    if (abandonForms.length > 0) {
+        output += `\nABANDON CARTS:\n`;
+        abandonForms.forEach(item => {
+            const avgUnits = item.orders > 0 ? (item.productUnits / item.orders).toFixed(2) : '0.00';
+            output += `  ${item.name}\n`;
+            output += `    Orders: ${item.orders} | Revenue: $${item.revenue.toFixed(2)} | Units: ${item.productUnits} | Avg Units/Order: ${avgUnits}\n`;
+            output += `    Optins: ${item.optins} | Optins/Sale: ${item.optinsPerSale}\n`;
+        });
+        const abandonTotalUnits = abandonForms.reduce((sum, f) => sum + f.productUnits, 0);
+        const abandonTotalOptins = abandonForms.reduce((sum, f) => sum + f.optins, 0);
+        const abandonAvgUnits = abandonOrders > 0 ? (abandonTotalUnits / abandonOrders).toFixed(2) : '0.00';
+        const abandonOptinsPerSale = abandonOrders > 0 ? (abandonTotalOptins / abandonOrders).toFixed(2) : '0.00';
+        output += `  ─────────────────────────────────────────────────────────────────\n`;
+        output += `  Subtotal: ${abandonOrders} orders | $${abandonFormRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} revenue | ${abandonTotalUnits} units | Avg: ${abandonAvgUnits} units/order\n`;
+        output += `  Subtotal Optins: ${abandonTotalOptins} | Optins/Sale: ${abandonOptinsPerSale}\n`;
+    }
+    
+    output += `\n>>> TOTAL ORDERS: ${totalOrders}\n`;
+    output += `>>> TOTAL REVENUE: $${totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+    output += `>>> AVG ORDER VALUE: $${avgOrderValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+
+    output += `
+================================================================================
+MAIN ORDER FORM PRODUCTS
+================================================================================
+`;
+
+    if (results.products.length === 0) {
+        output += `(No main products detected)\n`;
+    } else {
+        results.products.forEach(item => {
+            output += `${item.name}
+  Sales: ${item.sales} | Qty: ${item.quantity} | Units: ${item.units} | Revenue: $${item.revenue.toFixed(2)}\n\n`;
+        });
+    }
+    output += `>>> Main Product Units: ${mainUnits}\n`;
+    output += `>>> Main Product Revenue: $${mainProductRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+
+    output += `
+================================================================================
+UPSELL PRODUCTS (units count, NOT orders)
+================================================================================
+`;
+
+    if (results.upsells.length === 0) {
+        output += `(No upsell products detected)\n`;
+    } else {
+        results.upsells.forEach(item => {
+            output += `${item.name}
+  Sales: ${item.sales} | Qty: ${item.quantity} | Units: ${item.units} | Revenue: $${item.revenue.toFixed(2)}\n\n`;
+        });
+    }
+    output += `>>> Upsell Units: ${upsellUnits}\n`;
+    output += `>>> Upsell Revenue: $${upsellRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+
+    if (results.unclear.length > 0) {
+        output += `
+================================================================================
+⚠️ UNCLEAR - NEEDS CLARIFICATION (${results.unclear.length} items)
+================================================================================
+These items need manual input to determine the correct quantity of physical items:
+
+`;
+        results.unclear.forEach((item, index) => {
+            output += `${index + 1}. ${item.name}
+   Sales: ${item.sales} | Current Qty Guess: ${item.quantity} | Revenue: $${item.revenue.toFixed(2)}
+   Context: ${item.context.toUpperCase()}
+   ❓ Reason: ${item.unclearReasons.join('; ')}
+   ➡️  How many physical items are in this product?\n\n`;
+        });
+        output += `>>> Unclear Units (using guessed qty): ${unclearUnits}\n`;
+        output += `>>> Unclear Revenue: $${unclearRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+    }
+
+    if (results.excluded.length > 0) {
+        const excludedRevenue = results.excluded.reduce((sum, e) => sum + (e.revenue || 0), 0);
+        output += `
+================================================================================
+EXCLUDED (Non-Physical)
+================================================================================
+`;
+        results.excluded.forEach(item => {
+            output += `${item.name} (${item.sales} sales | $${(item.revenue || 0).toFixed(2)}) - ${item.reason}\n`;
+        });
+        output += `─────────────────────────────────────────────────────────────────\n`;
+        output += `>>> Excluded Revenue: $${excludedRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}\n`;
+    }
+
+    output += `
+================================================================================
+SUMMARY
+================================================================================
+Total Order Forms: ${results.orderForms.length} (${mainForms.length} main + ${abandonForms.length} abandon)
+Total Orders: ${totalOrders}
+TOTAL REVENUE: $${totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+Average Order Value: $${avgOrderValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+─────────────────────────────────────────────────────────────────
+Main Product Units: ${mainUnits}
+Upsell Units: ${upsellUnits}
+${results.unclear.length > 0 ? `Unclear Units (pending): ${unclearUnits}\n` : ''}CONFIRMED PHYSICAL UNITS: ${totalUnits}
+${results.unclear.length > 0 ? `ESTIMATED TOTAL (if unclear items are correct): ${totalUnits + unclearUnits}\n` : ''}Average Units Per Order (confirmed only): ${totalOrders > 0 ? (totalUnits / totalOrders).toFixed(2) : 'N/A'}
+${results.unclear.length > 0 ? `Average Units Per Order (estimated): ${totalOrders > 0 ? ((totalUnits + unclearUnits) / totalOrders).toFixed(2) : 'N/A'}` : ''}
+${results.unclear.length > 0 ? `\n⚠️  Please provide quantities for the ${results.unclear.length} unclear item(s) above to get accurate totals.` : ''}
+
+================================================================================
+RAW JSON (for AI processing)
+================================================================================
+`;
+
+    const cleanData = {
+        funnelName: results.funnelName,
+        totalOrders: totalOrders,
+        totalRevenue: totalRevenue,
+        averageOrderValue: parseFloat(avgOrderValue.toFixed(2)),
+        totalOrderForms: results.orderForms.length,
+        confirmedUnits: totalUnits,
+        unclearUnits: unclearUnits,
+        estimatedTotalUnits: totalUnits + unclearUnits,
+        averageUnitsPerOrder: totalOrders > 0 ? parseFloat((totalUnits / totalOrders).toFixed(2)) : 0,
+        estimatedAverageUnitsPerOrder: totalOrders > 0 ? parseFloat(((totalUnits + unclearUnits) / totalOrders).toFixed(2)) : 0,
+        revenueBreakdown: {
+            mainOrderForms: mainFormRevenue,
+            abandonCarts: abandonFormRevenue,
+            mainProducts: mainProductRevenue,
+            upsells: upsellRevenue,
+            unclear: unclearRevenue
+        },
+        orderForms: results.orderForms,
+        mainProducts: results.products,
+        upsellProducts: results.upsells,
+        unclearProducts: results.unclear,
+        excluded: results.excluded
+    };
+
+    output += JSON.stringify(cleanData, null, 2);
+
+    console.log(output);
+    
+    // Copy to clipboard - use fallback method that works in console
+    const copyToClipboard = (text) => {
+        // Method 1: Create a temporary textarea (most reliable from console)
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.top = '0';
+        textarea.style.left = '0';
+        textarea.style.width = '2em';
+        textarea.style.height = '2em';
+        textarea.style.padding = '0';
+        textarea.style.border = 'none';
+        textarea.style.outline = 'none';
+        textarea.style.boxShadow = 'none';
+        textarea.style.background = 'transparent';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        
+        let success = false;
+        try {
+            success = document.execCommand('copy');
+        } catch (err) {
+            success = false;
+        }
+        
+        document.body.removeChild(textarea);
+        
+        if (success) {
+            console.log('\n✅ Output copied to clipboard!');
+            return true;
+        }
+        
+        // Method 2: Try modern API as fallback
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                console.log('\n✅ Output copied to clipboard!');
+            }).catch(() => {
+                console.log('\n⚠️ Could not copy to clipboard. Please select and copy the output above.');
+            });
+            return;
+        }
+        
+        console.log('\n⚠️ Could not copy to clipboard. Please select and copy the output above.');
+        return false;
+    };
+    
+    copyToClipboard(output);
+
+    return cleanData;
+})();
