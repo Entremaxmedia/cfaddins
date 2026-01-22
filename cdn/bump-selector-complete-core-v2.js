@@ -365,6 +365,11 @@ $(function () {
       else                                deactivateBump(cfg);
     });
 
+    // Immediate rebuild to ensure preselected bumps appear in order summary on page load
+    setTimeout(function() {
+      forceOrderSummaryRebuild();
+    }, 50);
+
     setTimeout(function() {
       BUMPS.forEach(function (cfg) {
         if (cfg.$visibleChk && cfg.$visibleChk.is(':checked')) {
