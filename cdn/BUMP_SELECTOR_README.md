@@ -327,4 +327,4 @@ If migrating from inline footer code to modularized version:
 ## License & Attribution
 
 © 2026 Entremax Media | CFAddins Repository
-Repository: https://github.com/kratner/ace-media-cfaddins
+Repository: https://github.com/entremaxmedia/cfaddins
