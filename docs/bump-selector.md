@@ -2,7 +2,7 @@
 
 **Version:** 1.3.0  
 **Last Updated:** December 17, 2025  
-**Repository:** [kratner/ace-media-cfaddins](https://github.com/kratner/ace-media-cfaddins)
+**Repository:** [kratner/cfaddins](https://github.com/kratner/ace-media-cfaddins)
 
 ## Table of Contents
 
@@ -954,7 +954,7 @@ window.BUMP_CONFIG = [{
 ## Support and Contributing
 
 ### Repository
-[https://github.com/kratner/ace-media-cfaddins](https://github.com/kratner/ace-media-cfaddins)
+[https://github.com/entremaxmedia/cfaddins](https://github.com/entremaxmedia/cfaddins)
 
 ### Issues
 Report bugs or request features via GitHub Issues
