@@ -10,3 +10,10 @@ ehthumbs.db
 
 # Folder config file
 [Dd]esktop.ini
+# macOS files
+.DS_Store
+
+# Google Drive metadata and autosave files
+.~*
+*.gsheet
+*.gdoc
