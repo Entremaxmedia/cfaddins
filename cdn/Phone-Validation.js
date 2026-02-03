@@ -16,11 +16,35 @@ document.addEventListener('DOMContentLoaded', function() {
     phoneInput.style.backgroundColor = '';
   }
   
-  // Clear error styling when user starts typing
+  // Clear error styling and normalize on blur
   phoneInput.addEventListener('input', clearError);
   
+  phoneInput.addEventListener('blur', function() {
+    const digits = phoneInput.value.replace(/\D/g, '');
+    if (digits.length === 10) {
+      phoneInput.value = '+1' + digits;
+    } else if (digits.length === 11 && digits.charAt(0) === '1') {
+      phoneInput.value = '+1' + digits.substring(1);
+    }
+  });
+  
   step1Button.addEventListener('click', function(e) {
-    const phone = phoneInput.value.replace(/\D/g, '');
+    const rawPhone = phoneInput.value.trim();
+    
+    // Check for letters
+    if (/[a-zA-Z]/.test(rawPhone)) {
+      e.preventDefault();
+      e.stopPropagation();
+      showError('Please enter a valid phone number (no letters)');
+      return false;
+    }
+    
+    const digits = rawPhone.replace(/\D/g, '');
+    
+    // Handle if they already entered with country code
+    const phone = digits.length === 11 && digits.charAt(0) === '1' 
+      ? digits.substring(1) 
+      : digits;
     
     // Check length
     if (phone.length !== 10) {
@@ -53,6 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
       showError('Please enter a valid phone number');
       return false;
     }
+    
+    // Normalize to E.164 format
+    phoneInput.value = '+1' + phone;
     
     clearError();
   });
