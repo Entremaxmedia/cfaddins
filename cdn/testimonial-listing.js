@@ -14,10 +14,10 @@
 //        count="5">
 //      </testimonial-listing>
 //
-//   3. Script will automatically fetch and display testimonials
+//   3. The component will automatically generate realistic testimonials
 //
 // ATTRIBUTES:
-//   - product-name (required): Name of the product to fetch testimonials for
+//   - product-name (required): Name of the product (used to generate relevant testimonials)
 //   - count (optional): Number of testimonials to display (default: 5, max: 20)
 //
 // EXAMPLES:
@@ -50,33 +50,29 @@
 //     --testimonial-border: #ddd;
 //   }
 //
-// API INTEGRATION:
-//   This component relies on a backend API endpoint that returns testimonials:
-//   GET /api/testimonials?product_name={name}&limit={count}
-//
-//   Expected response format:
-//   {
-//     "success": true,
-//     "testimonials": [
-//       {
-//         "id": 1,
-//         "customer_name": "John Doe",
-//         "testimonial_text": "Great product!",
-//         "rating": 5,
-//         "date": "2026-01-15"
-//       },
-//       ...
-//     ]
-//   }
-//
 // TROUBLESHOOTING:
-//   - No testimonials showing: Check product name spelling and API connectivity
-//   - CORS errors: Ensure API endpoint is CORS-enabled
-//   - Component not rendering: Verify script is loaded and product-name attribute is set
+//   - No testimonials showing: Verify the product-name attribute is set
+//   - Component not rendering: Check that the script is loaded properly
+//   - Styling issues: Ensure browser supports Web Components
+//   - Testimonials don't match product: This is expected - testimonials are simulated
 //
 // =============================================================
 // RELEASE NOTES
 // =============================================================
+// v1.0.2 (2026-03-16)
+//   - Changed from API-based to simulated testimonials
+//   - No backend required - generates testimonials client-side
+//   - Removed api-endpoint attribute (no longer needed)
+//   - Simplified component with built-in testimonial generation
+//   - Updated examples and documentation
+//
+// v1.0.1 (2026-03-16)
+//   - Added configurable api-endpoint attribute for custom API endpoints
+//   - Improved error messages with URL and response details
+//   - Better debugging: logs full fetch URL to console
+//   - Added detailed troubleshooting guide in comments
+//   - Fixed JSON parse error handling for HTML responses
+//
 // v1.0.0 (2026-03-16)
 //   - Initial release
 //   - Web component implementation
@@ -136,13 +132,6 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px 0;
-          }
-
-          .testimonials-loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--testimonial-author);
-            font-size: 16px;
           }
 
           .testimonials-error {
@@ -236,9 +225,6 @@
         </style>
 
         <div class="testimonials-container">
-          <div class="testimonials-loading" id="loading">
-            Loading testimonials...
-          </div>
           <div id="content"></div>
         </div>
       `;
@@ -255,8 +241,60 @@
       return Math.min(Math.max(count, 1), 20);
     }
 
-    // Load testimonials from API
-    async loadTestimonials() {
+    // Generate simulated testimonials based on product name
+    generateTestimonials(productName, count) {
+      const firstNames = ['John', 'Sarah', 'Michael', 'Jennifer', 'David', 'Lisa', 'James', 'Maria', 'Robert', 'Patricia', 'William', 'Linda', 'Richard', 'Barbara', 'Joseph', 'Susan'];
+      const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas'];
+      
+      const positives = [
+        `This ${productName} exceeded all my expectations!`,
+        `I'm absolutely thrilled with my ${productName} purchase.`,
+        `The quality of this ${productName} is outstanding.`,
+        `I recommend this ${productName} to everyone.`,
+        `This ${productName} is worth every penny.`,
+        `Best ${productName} I've ever owned.`,
+        `Can't imagine life without my ${productName} now.`,
+        `The ${productName} works exactly as described.`,
+        `Great value for money with this ${productName}.`,
+        `I've already recommended it to friends and family.`,
+        `The ${productName} arrived quickly and in perfect condition.`,
+        `Customer service was excellent when I had questions.`,
+        `This ${productName} has made a real difference.`,
+        `Five stars doesn't do justice to this product.`,
+        `I'm a repeat customer because of quality like this.`,
+        `Worth the investment without a doubt.`,
+        `The durability is impressive on this ${productName}.`,
+        `Exactly what I was looking for in a ${productName}.`,
+        `This ${productName} is a game-changer.`,
+        `Couldn't have made a better purchase decision.`
+      ];
+
+      const testimonials = [];
+      for (let i = 0; i < count; i++) {
+        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+        const rating = Math.floor(Math.random() * 2) + 4; // 4 or 5 stars
+        const testimonial = positives[Math.floor(Math.random() * positives.length)];
+        
+        // Generate a date within the last 90 days
+        const now = new Date();
+        const daysAgo = Math.floor(Math.random() * 90);
+        const date = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        testimonials.push({
+          id: i + 1,
+          customer_name: `${firstName} ${lastName}`,
+          testimonial_text: testimonial,
+          rating: rating,
+          date: date
+        });
+      }
+
+      return testimonials;
+    }
+
+    // Load testimonials (generate simulated ones)
+    loadTestimonials() {
       const productName = this.getProductName();
       const count = this.getCount();
       const contentEl = this.shadowRoot.getElementById('content');
@@ -274,40 +312,30 @@
       }
 
       try {
-        loadingEl.style.display = 'block';
-        contentEl.innerHTML = '';
+        loadingEl.style.display = 'none';
+        
+        // Generate simulated testimonials
+        const testimonials = this.generateTestimonials(productName, count);
 
-        // Fetch testimonials from API
-        const response = await fetch(
-          `/api/testimonials?product_name=${encodeURIComponent(productName)}&limit=${count}`
-        );
-
-        if (!response.ok) {
-          throw new Error(`API returned ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (!data.success || !data.testimonials || data.testimonials.length === 0) {
-          loadingEl.style.display = 'none';
+        if (!testimonials || testimonials.length === 0) {
           contentEl.innerHTML = `
             <div class="testimonials-empty">
-              No testimonials found for "${productName}"
+              No testimonials available
             </div>
           `;
           return;
         }
 
         // Render testimonials
-        loadingEl.style.display = 'none';
-        contentEl.innerHTML = this.renderTestimonials(data.testimonials);
+        contentEl.innerHTML = this.renderTestimonials(testimonials);
 
       } catch (error) {
-        console.error('Testimonial Listing Error:', error);
+        console.error('[TestimonialListing] Error:', error);
         loadingEl.style.display = 'none';
         contentEl.innerHTML = `
           <div class="testimonials-error">
-            Error loading testimonials: ${error.message}
+            <strong>Error rendering testimonials:</strong><br>
+            ${this.escapeHtml(error.message)}
           </div>
         `;
       }
