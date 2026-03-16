@@ -321,7 +321,6 @@
       const productName = this.getProductName();
       const count = this.getCount();
       const contentEl = this.shadowRoot.getElementById('content');
-      const loadingEl = this.shadowRoot.querySelector('.testimonials-loading');
 
       console.log(`[TestimonialListing v${TestimonialListing.version}] Loading testimonials:`, {
         productName,
@@ -331,7 +330,6 @@
 
       // Validate product name
       if (!productName) {
-        loadingEl.style.display = 'none';
         contentEl.innerHTML = `
           <div class="testimonials-error">
             Error: product-name attribute is required
@@ -342,8 +340,6 @@
       }
 
       try {
-        loadingEl.style.display = 'none';
-        
         // Generate simulated testimonials
         const testimonials = this.generateTestimonials(productName, count);
         console.log(`[TestimonialListing v${TestimonialListing.version}] Generated ${testimonials.length} testimonials`);
@@ -364,7 +360,6 @@
 
       } catch (error) {
         console.error(`[TestimonialListing v${TestimonialListing.version}] Error:`, error);
-        loadingEl.style.display = 'none';
         contentEl.innerHTML = `
           <div class="testimonials-error">
             <strong>Error rendering testimonials:</strong><br>
