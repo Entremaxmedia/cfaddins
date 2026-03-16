@@ -1,11 +1,13 @@
 // =============================================================
 // Testimonial Listing Web Component
 // =============================================================
-// VERSION: 1.0.0 (2026-03-16)
+// VERSION: 1.0.2
+// BUILD DATE: 2026-03-16
+// LAST UPDATED: 2026-03-16
 // REPOSITORY: https://github.com/entremaxmedia/cfaddins
 // CDN: https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/testimonial-listing.js
 //
-// HOW TO USE:
+// CHANGELOG v1.0.2: Switched from API to simulated testimonials
 //   1. Add this script to a ClickFunnels Custom HTML/JavaScript element
 //   2. Use the web component in your HTML with attributes:
 //
@@ -87,11 +89,25 @@
 (function() {
   'use strict';
 
+  // Log version information to console
+  console.log('%c✓ Testimonial Listing Component Loaded', 'color: #4CAF50; font-weight: bold; font-size: 12px;');
+  console.log('%cVersion: 1.0.2 | Built: 2026-03-16', 'color: #666; font-size: 11px;');
+  console.log('%cRepo: https://github.com/entremaxmedia/cfaddins', 'color: #2196F3; font-size: 11px;');
+
   // Define the testimonial listing web component
   class TestimonialListing extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({ mode: 'open' });
+    }
+
+    // Version information
+    static get version() {
+      return '1.0.2';
+    }
+
+    static get buildDate() {
+      return '2026-03-16';
     }
 
     // Define observed attributes
@@ -101,6 +117,13 @@
 
     // Lifecycle: element inserted into DOM
     connectedCallback() {
+      const productName = this.getAttribute('product-name');
+      const count = this.getAttribute('count') || '5';
+      console.log(`[TestimonialListing v${TestimonialListing.version}] Component initialized:`, {
+        productName,
+        count: parseInt(count),
+        element: this
+      });
       this.render();
       this.loadTestimonials();
     }
@@ -300,6 +323,12 @@
       const contentEl = this.shadowRoot.getElementById('content');
       const loadingEl = this.shadowRoot.querySelector('.testimonials-loading');
 
+      console.log(`[TestimonialListing v${TestimonialListing.version}] Loading testimonials:`, {
+        productName,
+        count,
+        element: this
+      });
+
       // Validate product name
       if (!productName) {
         loadingEl.style.display = 'none';
@@ -308,6 +337,7 @@
             Error: product-name attribute is required
           </div>
         `;
+        console.warn(`[TestimonialListing v${TestimonialListing.version}] Missing product-name attribute`);
         return;
       }
 
@@ -316,6 +346,7 @@
         
         // Generate simulated testimonials
         const testimonials = this.generateTestimonials(productName, count);
+        console.log(`[TestimonialListing v${TestimonialListing.version}] Generated ${testimonials.length} testimonials`);
 
         if (!testimonials || testimonials.length === 0) {
           contentEl.innerHTML = `
@@ -323,14 +354,16 @@
               No testimonials available
             </div>
           `;
+          console.warn(`[TestimonialListing v${TestimonialListing.version}] No testimonials generated`);
           return;
         }
 
         // Render testimonials
         contentEl.innerHTML = this.renderTestimonials(testimonials);
+        console.log(`[TestimonialListing v${TestimonialListing.version}] Testimonials rendered successfully`);
 
       } catch (error) {
-        console.error('[TestimonialListing] Error:', error);
+        console.error(`[TestimonialListing v${TestimonialListing.version}] Error:`, error);
         loadingEl.style.display = 'none';
         contentEl.innerHTML = `
           <div class="testimonials-error">
