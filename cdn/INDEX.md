@@ -1,6 +1,6 @@
-# Bump Selector v1.2.7 — Documentation Index
+# Bump Selector v1.2.8 — Documentation Index
 
-**Refactored:** January 27, 2026  
+**Latest:** July 24, 2026 (v1.2.8) — see [Recent Changes](#-recent-changes)  
 **Status:** ✅ Production Ready  
 **Repository:** https://github.com/kratner/ace-media-cfaddins
 
@@ -57,7 +57,7 @@ Overview of what changed and why.
 ## 📦 Source Files
 
 ### Core Engine
-**File:** `bump-selector-v1.2.7.js` (~600 lines)
+**File:** `bump-selector-v1.2.8.js` (~600 lines) — current version. `bump-selector-v1.2.7.js` remains for funnels already pointed at it (never delete/rename live CDN files).
 
 **Responsibilities:**
 - Read configuration from `window.BUMP_CONFIG`
@@ -199,8 +199,10 @@ window.BUMP_CONFIG = [
   }
 ];
 </script>
-<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.7.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.8.js"></script>
 ```
+
+**Note:** `window.BUMP_CONFIG` array order no longer needs to match the live DOM order of the bump blocks (fixed in v1.2.8 — see [Recent Changes](#-recent-changes)).
 
 ---
 
@@ -219,7 +221,7 @@ window.BUMP_CONFIG = [
 <script>window.BUMP_CONFIG = [...]; </script>
 
 <!-- 4. Load engine -->
-<script src="bump-selector-v1.2.7.js"></script>
+<script src="bump-selector-v1.2.8.js"></script>
 
 <!-- 5. CF Pro Tools -->
 <script src="cfptaddons.com/...js" defer></script>
@@ -285,7 +287,8 @@ window.BUMP_CONFIG = [
 | Resource | URL |
 |----------|-----|
 | GitHub Repository | https://github.com/kratner/ace-media-cfaddins |
-| CDN (bump-selector-v1.2.7.js) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.7.js |
+| CDN (bump-selector-v1.2.8.js) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.8.js |
+| CDN (bump-selector-v1.2.7.js, legacy) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.7.js |
 | CDN (bump-selector-base.css) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-base.css |
 | CDN (bump-selector-fx.css) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-fx.css |
 | ClickFunnels Docs | https://www.clickfunnels.com/help |
@@ -297,13 +300,44 @@ window.BUMP_CONFIG = [
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
-| v1.2.7 | Jan 27, 2026 | ✅ Production | Modularized refactor |
+| v1.2.8 | Jul 24, 2026 | ✅ Production (current) | Bump containers matched by product ID (data-title), no longer order-dependent |
+| v1.2.7 | Jan 27, 2026 | 📦 Legacy | Modularized refactor — still live for funnels pointed at it |
 | v1.2.6 | Earlier | 📦 Legacy | Available in GitHub history |
 | v1.2.5 | Earlier | 📦 Legacy | Available in GitHub history |
 
 ---
 
 ## 📝 Recent Changes
+
+### v1.2.8 Order-Independent Bump Matching (Jul 24, 2026)
+
+**Bug fixed:** `findBumpContainerByCfg()` located each bump's `.orderFormBump`
+wrapper by first searching for a `<input type="radio" value="{productId}">`
+and walking up to `.closest('.orderFormBump')`. On pages where CF's bump
+checkboxes carry no product ID (they're often just a generic, non-unique
+`id="bump-offer"`), that lookup always failed and matching silently fell back
+to pairing `window.BUMP_CONFIG` array position with `.orderFormBump` DOM
+position. If CF Pro Tools' "Multiple Bumps"/"Bump Content" add-ins rendered
+the bump blocks in a different order than the config array listed them, a
+bump's dropdown/badge got injected into a *different* bump's header —
+e.g. two variant bumps' quantity dropdowns and discount badges swapping with
+each other, and the order summary showing the wrong line item for what was
+checked.
+
+**Fix:** container lookup now tries `[data-title="cf-multi-bump-{productId}"]`
+first — the wrapper CF Pro Tools' "Multiple Bumps" add-in already tags with
+the real product ID, independent of DOM order — before falling back to the
+old radio-lookup and positional-index behavior. `window.BUMP_CONFIG` entries
+no longer need to be listed in the same order the bumps render on the page.
+
+✅ **Backwards compatible:** the v1.2.7 radio-lookup and positional-index
+fallbacks are unchanged and still run if the data-title match finds nothing,
+so any funnel without CF Pro Tools' "Multiple Bumps" markup behaves exactly
+as before. No BUMP_CONFIG changes required to adopt v1.2.8.
+
+**Existing funnels:** stay on `bump-selector-v1.2.7.js` unless/until you
+switch them to v1.2.8 — per the CDN safety rules, nothing was renamed or
+removed.
 
 ### v1.2.7 Modularization (Jan 27, 2026)
 ✅ **NEW:**
@@ -366,6 +400,6 @@ Include:
 
 ---
 
-**Last Updated:** January 27, 2026  
+**Last Updated:** July 24, 2026  
 **Maintainer:** Keith Ratner / Entremax Media  
 **License:** © 2026 Entremax Media
