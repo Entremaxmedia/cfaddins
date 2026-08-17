@@ -1,6 +1,6 @@
-# Bump Selector v1.2.8 — Documentation Index
+# Bump Selector v1.2.9 — Documentation Index
 
-**Latest:** July 24, 2026 (v1.2.8) — see [Recent Changes](#-recent-changes)  
+**Latest:** August 17, 2026 (v1.2.9) — see [Recent Changes](#-recent-changes)  
 **Status:** ✅ Production Ready  
 **Repository:** https://github.com/kratner/ace-media-cfaddins
 
@@ -57,7 +57,7 @@ Overview of what changed and why.
 ## 📦 Source Files
 
 ### Core Engine
-**File:** `bump-selector-v1.2.8.js` (~600 lines) — current version. `bump-selector-v1.2.7.js` remains for funnels already pointed at it (never delete/rename live CDN files).
+**File:** `bump-selector-v1.2.9.js` (~600 lines) — current version. `bump-selector-v1.2.8.js` and `bump-selector-v1.2.7.js` remain for funnels already pointed at them (never delete/rename live CDN files).
 
 **Responsibilities:**
 - Read configuration from `window.BUMP_CONFIG`
@@ -199,10 +199,10 @@ window.BUMP_CONFIG = [
   }
 ];
 </script>
-<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.8.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.9.js"></script>
 ```
 
-**Note:** `window.BUMP_CONFIG` array order no longer needs to match the live DOM order of the bump blocks (fixed in v1.2.8 — see [Recent Changes](#-recent-changes)).
+**Note:** `window.BUMP_CONFIG` array order no longer needs to match the live DOM order of the bump blocks (fixed in v1.2.8 — see [Recent Changes](#-recent-changes)). v1.2.9 fixes a main-product-change race that could leave two variants of the same bump checked and charged together — see [Recent Changes](#-recent-changes).
 
 ---
 
@@ -221,7 +221,7 @@ window.BUMP_CONFIG = [
 <script>window.BUMP_CONFIG = [...]; </script>
 
 <!-- 4. Load engine -->
-<script src="bump-selector-v1.2.8.js"></script>
+<script src="bump-selector-v1.2.9.js"></script>
 
 <!-- 5. CF Pro Tools -->
 <script src="cfptaddons.com/...js" defer></script>
@@ -287,7 +287,8 @@ window.BUMP_CONFIG = [
 | Resource | URL |
 |----------|-----|
 | GitHub Repository | https://github.com/kratner/ace-media-cfaddins |
-| CDN (bump-selector-v1.2.8.js) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.8.js |
+| CDN (bump-selector-v1.2.9.js) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.9.js |
+| CDN (bump-selector-v1.2.8.js, legacy) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.8.js |
 | CDN (bump-selector-v1.2.7.js, legacy) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.7.js |
 | CDN (bump-selector-base.css) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-base.css |
 | CDN (bump-selector-fx.css) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-fx.css |
@@ -300,7 +301,8 @@ window.BUMP_CONFIG = [
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
-| v1.2.8 | Jul 24, 2026 | ✅ Production (current) | Bump containers matched by product ID (data-title), no longer order-dependent |
+| v1.2.9 | Aug 17, 2026 | ✅ Production (current) | Fixed restoreSelections() leaving two variants of the same bump checked/charged after a main-product change |
+| v1.2.8 | Jul 24, 2026 | 📦 Legacy | Bump containers matched by product ID (data-title), no longer order-dependent — still live for funnels pointed at it |
 | v1.2.7 | Jan 27, 2026 | 📦 Legacy | Modularized refactor — still live for funnels pointed at it |
 | v1.2.6 | Earlier | 📦 Legacy | Available in GitHub history |
 | v1.2.5 | Earlier | 📦 Legacy | Available in GitHub history |
@@ -308,6 +310,42 @@ window.BUMP_CONFIG = [
 ---
 
 ## 📝 Recent Changes
+
+### v1.2.9 Fixed Duplicate Variant Charge on Main-Product Change (Aug 17, 2026)
+
+**Bug fixed:** Every code path that checks a bump variant — `activateBump()` and
+the dropdown's `change` handler — calls `uncheckAllVariantIds()` first to make
+sure only one variant of a bump (e.g. "1 CPR Car Kit" vs. "2 CPR Car Kits, 15%
+Off") is ever checked at a time. `restoreSelections()` — fired ~600ms after the
+shopper changes the **main product/tier** (`bindCoreProductChange`) — was the
+one path that skipped this step. It re-checked the previously-saved variant
+directly, without clearing sibling variant IDs first.
+
+CF Pro Tools' "Bump Content" / "Multiple Bumps" add-ins re-render and
+re-default a bump's native checkbox whenever the main product changes. When
+that happened inside the 600ms window between `saveCurrentSelections()` and
+`restoreSelections()`, the saved variant got checked **on top of** the add-in's
+own default checkbox instead of replacing it — leaving both checked, and both
+submitted as separate paid line items.
+
+**Real order affected:** 1st Hour Trauma First Aid Kit funnel (13688167),
+Launch - Long Copy step, 8/11/2026 — shopper switched the main product to the
+5-Kit Full Family Bundle tier and was charged for both "1 CPR Car Kit"
+($29.99) and "2 CPR Car Kits, 15% Off" ($50.98) in the same transaction.
+
+**Fix:** `restoreSelections()` now calls `uncheckAllVariantIds()` before
+re-checking the saved value, matching `activateBump()` and the select
+`change` handler.
+
+✅ **Backwards compatible:** no `BUMP_CONFIG` changes required. Only affects
+the restore-after-main-product-change path; funnels without multiple main
+product tiers, or without a variant-dropdown bump, were never exposed to this.
+
+**Existing funnels:** stay on `bump-selector-v1.2.8.js` or `v1.2.7.js` unless
+switched to v1.2.9 — nothing was renamed or removed. Any funnel that offers
+more than one main-product tier **and** a quantity/variant bump dropdown
+should be prioritized for the upgrade, since that's the exact combination that
+triggers the bug.
 
 ### v1.2.8 Order-Independent Bump Matching (Jul 24, 2026)
 
@@ -400,6 +438,6 @@ Include:
 
 ---
 
-**Last Updated:** July 24, 2026  
+**Last Updated:** August 17, 2026  
 **Maintainer:** Keith Ratner / Entremax Media  
 **License:** © 2026 Entremax Media

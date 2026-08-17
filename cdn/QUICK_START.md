@@ -1,4 +1,4 @@
-# Bump Selector v1.2.7 — Quick Start Guide
+# Bump Selector v1.2.9 — Quick Start Guide
 
 ## For New Funnels
 
@@ -38,7 +38,7 @@ window.BUMP_CONFIG = [
 </script>
 
 <!-- Bump selector engine -->
-<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.7.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.9.js"></script>
 
 <!-- Your CF Pro Tools and other scripts -->
 <script src="https://cdn.cfptaddons.com/...js" defer></script>
