@@ -1,6 +1,6 @@
-# Bump Selector v1.2.9 — Documentation Index
+# Bump Selector v1.2.10 — Documentation Index
 
-**Latest:** August 17, 2026 (v1.2.9) — see [Recent Changes](#-recent-changes)  
+**Latest:** August 25, 2026 (v1.2.10) — see [Recent Changes](#-recent-changes)  
 **Status:** ✅ Production Ready  
 **Repository:** https://github.com/kratner/ace-media-cfaddins
 
@@ -57,7 +57,7 @@ Overview of what changed and why.
 ## 📦 Source Files
 
 ### Core Engine
-**File:** `bump-selector-v1.2.9.js` (~600 lines) — current version. `bump-selector-v1.2.8.js` and `bump-selector-v1.2.7.js` remain for funnels already pointed at them (never delete/rename live CDN files).
+**File:** `bump-selector-v1.2.10.js` (~615 lines) — current version. `bump-selector-v1.2.9.js`, `bump-selector-v1.2.8.js`, and `bump-selector-v1.2.7.js` remain for funnels already pointed at them (never delete/rename live CDN files).
 
 **Responsibilities:**
 - Read configuration from `window.BUMP_CONFIG`
@@ -199,10 +199,10 @@ window.BUMP_CONFIG = [
   }
 ];
 </script>
-<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.9.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.10.js"></script>
 ```
 
-**Note:** `window.BUMP_CONFIG` array order no longer needs to match the live DOM order of the bump blocks (fixed in v1.2.8 — see [Recent Changes](#-recent-changes)). v1.2.9 fixes a main-product-change race that could leave two variants of the same bump checked and charged together — see [Recent Changes](#-recent-changes).
+**Note:** `window.BUMP_CONFIG` array order no longer needs to match the live DOM order of the bump blocks (fixed in v1.2.8 — see [Recent Changes](#-recent-changes)). v1.2.9 and v1.2.10 each fix a different race that could leave two variants of the same bump checked and charged together — see [Recent Changes](#-recent-changes).
 
 ---
 
@@ -221,7 +221,7 @@ window.BUMP_CONFIG = [
 <script>window.BUMP_CONFIG = [...]; </script>
 
 <!-- 4. Load engine -->
-<script src="bump-selector-v1.2.9.js"></script>
+<script src="bump-selector-v1.2.10.js"></script>
 
 <!-- 5. CF Pro Tools -->
 <script src="cfptaddons.com/...js" defer></script>
@@ -287,7 +287,8 @@ window.BUMP_CONFIG = [
 | Resource | URL |
 |----------|-----|
 | GitHub Repository | https://github.com/kratner/ace-media-cfaddins |
-| CDN (bump-selector-v1.2.9.js) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.9.js |
+| CDN (bump-selector-v1.2.10.js) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.10.js |
+| CDN (bump-selector-v1.2.9.js, legacy) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.9.js |
 | CDN (bump-selector-v1.2.8.js, legacy) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.8.js |
 | CDN (bump-selector-v1.2.7.js, legacy) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-v1.2.7.js |
 | CDN (bump-selector-base.css) | https://cdn.jsdelivr.net/gh/kratner/ace-media-cfaddins@main/cdn/bump-selector-base.css |
@@ -301,7 +302,8 @@ window.BUMP_CONFIG = [
 
 | Version | Date | Status | Notes |
 |---------|------|--------|-------|
-| v1.2.9 | Aug 17, 2026 | ✅ Production (current) | Fixed restoreSelections() leaving two variants of the same bump checked/charged after a main-product change |
+| v1.2.10 | Aug 25, 2026 | ✅ Production (current) | Fixed the "notify CF Pro Tools" change-trigger (in initFromConfig + restoreSelections) re-checking a bump's mainProductId on top of the selected variant |
+| v1.2.9 | Aug 17, 2026 | 📦 Legacy | Fixed restoreSelections() leaving two variants of the same bump checked/charged after a main-product change — still live for funnels pointed at it |
 | v1.2.8 | Jul 24, 2026 | 📦 Legacy | Bump containers matched by product ID (data-title), no longer order-dependent — still live for funnels pointed at it |
 | v1.2.7 | Jan 27, 2026 | 📦 Legacy | Modularized refactor — still live for funnels pointed at it |
 | v1.2.6 | Earlier | 📦 Legacy | Available in GitHub history |
@@ -310,6 +312,55 @@ window.BUMP_CONFIG = [
 ---
 
 ## 📝 Recent Changes
+
+### v1.2.10 Fixed Duplicate Variant Charge on the CFPT Notify-Trigger (Aug 25, 2026)
+
+**Bug fixed:** v1.2.9 (below) closed one duplicate-charge race but left a
+second, related one. Both `initFromConfig()`'s startup pass and
+`restoreSelections()` end by calling `cfg.$visibleChk.trigger('change')` on
+each checked bump's native visible checkbox — necessary so CF Pro Tools'
+"Multiple Bumps" add-in registers the bump as active in its own bookkeeping.
+
+Inspecting CF Pro Tools' actual source confirmed the mechanism: at page
+load, "Multiple Bumps" hardcodes that checkbox's `value` attribute to the
+bump's `mainProductId` (`.find('[name="purchase[product_ids][]"]').val(bumpId)`),
+independent of whatever variant our dropdown has selected, and binds
+`.orderFormBump input[type="checkbox"][name="purchase[product_ids][]"]`'s
+`change` event to unconditionally set `#cfAR`'s mirror checkbox for that
+`value` to `checked` — with no clearing of sibling variant checkboxes. Our
+notify-trigger fires this handler **after** we'd already correctly enforced
+single-variant exclusivity, so CF Pro Tools re-checked the base/mainProductId
+variant on top of the one we'd just set, with nothing downstream to correct
+it — both got submitted.
+
+**Real order affected:** 1st Hour Trauma First Aid Kit funnel (13688167),
+Launch - Long Copy step, reported 8/25/2026 — shopper was charged for both
+"1 Expert Survivalist Kit" ($29.00) + "2 Expert Survivalist Kits, 15% Off"
+($49.30), and both "1 Water Filter Straw" ($19.95) + "2 Water Filter Straws,
+15% Off" ($33.92), in the same transaction after switching the main product
+tier to "3 Trauma First Aid Kit."
+
+**Fix:** new `enforceExclusivityAfterNotify()` re-runs
+`uncheckAllVariantIds(cfg, cfg.currentValue)` + re-checks `cfg.currentValue`
+immediately after the notify-trigger loop, in both `initFromConfig()` and
+`restoreSelections()`, so our selection is always the last word before the
+final order-summary rebuild.
+
+✅ **Backwards compatible:** no `BUMP_CONFIG` changes required. Affects any
+funnel with a variant-dropdown bump and the CF Pro Tools "Multiple Bumps" /
+"Bump Content" add-ins — broader than the v1.2.9 case, since it doesn't
+require a main-product-tier change to trigger on initial page load (though
+the 1st Hour report did involve one).
+
+**Not yet independently verified live** — this fix is grounded in reading CF
+Pro Tools' actual "Multiple Bumps" source (`cdn.cfptaddons.com/...`) rather
+than a reproduced browser test. **Test on the 1st Hour Launch - Long Copy
+order form before rolling to other funnels.**
+
+**Existing funnels:** stay on `bump-selector-v1.2.9.js` or earlier unless
+switched to v1.2.10 — nothing was renamed or removed. Prioritize any funnel
+combining a variant-dropdown bump with CF Pro Tools' "Multiple Bumps" /
+"Bump Content" add-ins for the upgrade.
 
 ### v1.2.9 Fixed Duplicate Variant Charge on Main-Product Change (Aug 17, 2026)
 
@@ -438,6 +489,6 @@ Include:
 
 ---
 
-**Last Updated:** August 17, 2026  
+**Last Updated:** August 25, 2026  
 **Maintainer:** Keith Ratner / Entremax Media  
 **License:** © 2026 Entremax Media
