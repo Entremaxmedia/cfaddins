@@ -1,0 +1,12 @@
+/* ============================================================================
+ * FILE: pack-your-box-skin-trump-gold.css
+ * PATH: Upsells/Pack Your Box/Pack Your Box 3.0/Engine/pack-your-box-skin-trump-gold.css
+ * ----------------------------------------------------------------------------
+ * Pack Your Box 3.0 — SKIN: Trump / Gold — DRAFT variable set (gold on navy, Anton + Inter). Designer to confirm against the Trump/Gold hero assets in Upsells/Pack Your Box/Elements/.
+ * Seeded 2026-09-26 by Scripts/seed_engine_css_v1.mjs; hand-maintained since.
+ * CF rules: every selector scoped under .pyb (the bar and toast sit on <body>);
+ * critical props !important; font sizes px/vw only; no position:sticky.
+ * ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&display=swap");
+.pyb,.pyb-bar,.pyb-toast{--pyb-red:#C9A227;--pyb-red-rgb:201,162,39;--pyb-red-deep:#8a6d12;--pyb-red-light:#e6c65a;--pyb-black:#0b1f3a;--pyb-gray:#3b4a5e;--pyb-off:#f7f3e8;--pyb-off2:#ede6d3;--pyb-tint:#fbf4dd;--pyb-line:rgba(11,31,58,.14);--pyb-disp:"Anton",Impact,"Arial Black",Arial,sans-serif;--pyb-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.pyb .pyb-headline span{color:var(--pyb-red)!important}

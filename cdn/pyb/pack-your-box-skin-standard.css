@@ -1,0 +1,53 @@
+/* ============================================================================
+ * FILE: pack-your-box-skin-standard.css
+ * PATH: Upsells/Pack Your Box/Pack Your Box 3.0/Engine/pack-your-box-skin-standard.css
+ * ----------------------------------------------------------------------------
+ * Pack Your Box 3.0 — SKIN: Standard / MyTacticalPromos (Fjalla One, the 2.0 card look — list rows, grey ADD button, green ADDED, red REMOVE on hover).
+ * Seeded 2026-09-26 by Scripts/seed_engine_css_v1.mjs; hand-maintained since.
+ * CF rules: every selector scoped under .pyb (the bar and toast sit on <body>);
+ * critical props !important; font sizes px/vw only; no position:sticky.
+ * ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap");
+.pyb,.pyb-bar,.pyb-toast{--pyb-red:#e31c23;--pyb-red-rgb:227,28,35;--pyb-red-deep:#b91517;--pyb-red-light:#ff5a52;--pyb-black:#2d2d2d;--pyb-gray:#434242;--pyb-off:#ffffff;--pyb-off2:#efefef;--pyb-tint:#fff49e;--pyb-line:#e3e3e3;--pyb-disp:"Fjalla One",Helvetica,Arial,sans-serif;--pyb-body:"Fjalla One",Helvetica,Arial,sans-serif}
+/* The 2.0 card rules, verbatim apart from the class prefix (extracted from Pack Your Box 2.0/Page/PYB2_PackYourBox_v1.html). */
+.pyb-row{display:flex!important;align-items:center!important;gap:clamp(10px,1.5vw,20px)!important;padding:15px 5px 20px!important;margin:0!important;background:#fff!important;border-bottom:1px solid #e3e3e3!important}
+.pyb-row.is-selected{background:#f4fbef!important}
+.pyb-media{flex:0 0 25%!important;max-width:25%!important;padding:0 10px!important}
+.pyb-img{display:block!important;width:100%!important;height:auto!important;max-width:100%!important}
+.pyb-body{flex:1 1 50%!important;min-width:0!important;padding:0 10px!important;text-align:left!important}
+.pyb-aside{flex:0 0 25%!important;max-width:25%!important;padding:0 10px!important;text-align:right!important}
+.pyb-title{font-size:clamp(24px,3vw,38px)!important;line-height:1.1!important;margin:0 0 6px!important;padding:0!important;color:#2d2d2d!important;font-weight:400!important}
+.pyb-blurb{font-size:clamp(15px,1.7vw,24px)!important;line-height:1.3!important;margin:0 0 12px!important;padding:0!important;color:#2d2d2d!important}
+.pyb-ctaline{font-size:clamp(15px,1.7vw,24px)!important;line-height:1.3!important;margin:0!important;padding:5px!important;background:#fff49e!important;color:#2d2d2d!important;display:inline-block!important}
+.pyb-retail{font-size:clamp(14px,1.6vw,24px)!important;color:#e31c23!important;text-decoration:line-through!important;margin:0 0 2px!important}
+.pyb-price{font-size:clamp(20px,2.4vw,32px)!important;color:#434242!important;margin:0 0 8px!important;line-height:1.1!important}
+.pyb-btn{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;width:100%!important;min-height:44px!important;padding:10px 14px!important;margin:0!important;border:1px solid #cfcfcf!important;border-radius:4px!important;background:#efefef!important;color:#2d2d2d!important;font-family:inherit!important;font-size:clamp(16px,1.8vw,20px)!important;line-height:1!important;cursor:pointer!important;-webkit-appearance:none!important;appearance:none!important;text-transform:uppercase!important;transition:none!important}
+.pyb-btn-icon{display:inline-block!important;width:20px!important;height:20px!important;border-radius:50%!important;background:#2d2d2d!important;color:#fff!important;font-size:15px!important;line-height:20px!important;text-align:center!important;flex:0 0 auto!important}
+.pyb-btn-icon::before{content:"+"!important}
+.pyb-btn .pyb-btn-label::before{content:"ADD"!important}
+.pyb-btn[aria-pressed="true"]{background:#2e7d32!important;border-color:#2e7d32!important;color:#fff!important}
+.pyb-btn[aria-pressed="true"] .pyb-btn-icon{background:#fff!important;color:#2e7d32!important}
+.pyb-btn[aria-pressed="true"] .pyb-btn-label::before{content:"ADDED"!important}
+.pyb-btn[aria-pressed="true"]:hover{background:#e43b2c!important;border-color:#e43b2c!important;color:#fff!important}
+.pyb-btn[aria-pressed="true"]:hover .pyb-btn-icon{background:#fff!important;color:#e43b2c!important}
+.pyb-btn[aria-pressed="true"]:hover .pyb-btn-icon::before{content:"\2212"!important}
+.pyb-btn[aria-pressed="true"]:hover .pyb-btn-label::before{content:"REMOVE"!important}
+.pyb-btn:focus-visible{outline:3px solid #1565c0!important;outline-offset:2px!important}
+@media (max-width:768px){
+  .pyb-row{padding:15px 14px 20px!important}
+  .pyb-row{flex-direction:column!important;align-items:stretch!important;text-align:center!important}
+  .pyb-media,.pyb-body,.pyb-aside{flex:1 1 auto!important;max-width:100%!important;text-align:center!important}
+  .pyb-media{max-width:70%!important;margin:0 auto!important}
+  .pyb-ctaline{display:block!important}
+  .pyb-btn{min-height:48px!important}
+}
+@media (hover:none){
+  .pyb-btn[aria-pressed="true"]:hover{background:#2e7d32!important;border-color:#2e7d32!important}
+  .pyb-btn[aria-pressed="true"]:hover .pyb-btn-icon{background:#fff!important;color:#2e7d32!important}
+  .pyb-btn[aria-pressed="true"]:hover .pyb-btn-icon::before{content:"+"!important}
+  .pyb-btn[aria-pressed="true"]:hover .pyb-btn-label::before{content:"ADDED"!important}
+}
+/* Structural extras the 2.0 look does not have. */
+.pyb-row{border-radius:0!important;box-shadow:none!important;outline:none!important;border:0!important;border-bottom:1px solid var(--pyb-line)!important}
+.pyb-row.is-selected::before{content:none!important}
+.pyb .pyb-intro{background:var(--pyb-black)!important}

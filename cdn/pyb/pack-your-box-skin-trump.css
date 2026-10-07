@@ -1,0 +1,20 @@
+/* ============================================================================
+ * FILE: pack-your-box-skin-trump.css
+ * PATH: Upsells/Pack Your Box/Pack Your Box 3.0/Engine/pack-your-box-skin-trump.css
+ * ----------------------------------------------------------------------------
+ * Pack Your Box 3.0 — SKIN: Trump funnels (freetrumpcommemorative.com family).
+ * Palette from the live upsell step: red uppercase display type on white,
+ * navy ink, a gold accent, and the yellow highlight the 1.0 rows used on
+ * their "Click +ADD" line. Fonts as on the page: Oswald (display) + Fjalla One.
+ * Created 2026-09-29. Card/CTA structure comes from pack-your-box.css.
+ * ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Fjalla+One&display=swap");
+.pyb,.pyb-bar,.pyb-toast{--pyb-red:#C8102E;--pyb-red-rgb:200,16,46;--pyb-red-deep:#8C0A22;--pyb-red-light:#ff6b6b;--pyb-black:#0B1F3A;--pyb-gray:#3B4A5E;--pyb-off:#F6F7FB;--pyb-off2:#ECEEF5;--pyb-tint:#FFF49E;--pyb-line:rgba(11,31,58,.14);--pyb-disp:"Oswald","Fjalla One",Impact,Arial,sans-serif;--pyb-body:"Fjalla One",Helvetica,Arial,sans-serif;--pyb-gold:#C9A227}
+.pyb .pyb-headline span{color:var(--pyb-gold)!important}
+.pyb .pyb-eyebrow{color:var(--pyb-gold)!important}
+.pyb .pyb-intro{border-bottom-color:var(--pyb-gold)!important}
+.pyb-row.is-selected::before{background:var(--pyb-gold)!important;color:var(--pyb-black)!important}
+.pyb-ctaline{background:var(--pyb-tint)!important;border-left-color:var(--pyb-gold)!important;color:var(--pyb-black)!important}
+.pyb-bar{border-top-color:var(--pyb-gold)!important}
+.pyb-bar-total{color:var(--pyb-gold)!important}
+.pyb .pyb-summary strong:last-child{color:#FFD86B!important}

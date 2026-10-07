@@ -1,0 +1,11 @@
+/* ============================================================================
+ * FILE: pack-your-box-skin-1sthour.css
+ * PATH: Upsells/Pack Your Box/Pack Your Box 3.0/Engine/pack-your-box-skin-1sthour.css
+ * ----------------------------------------------------------------------------
+ * Pack Your Box 3.0 — SKIN: 1st Hour (red / black, Anton + Inter). Same values as the structural defaults, stated explicitly.
+ * Seeded 2026-09-26 by Scripts/seed_engine_css_v1.mjs; hand-maintained since.
+ * CF rules: every selector scoped under .pyb (the bar and toast sit on <body>);
+ * critical props !important; font sizes px/vw only; no position:sticky.
+ * ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&display=swap");
+.pyb,.pyb-bar,.pyb-toast{--pyb-red:#E21C13;--pyb-red-rgb:226,28,19;--pyb-red-deep:#a3130c;--pyb-red-light:#ff5a52;--pyb-black:#111111;--pyb-gray:#444444;--pyb-off:#F7F7F7;--pyb-off2:#f0efe9;--pyb-tint:#fff1f0;--pyb-line:rgba(17,17,17,.12);--pyb-disp:"Anton",Impact,"Arial Black",Arial,sans-serif;--pyb-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
