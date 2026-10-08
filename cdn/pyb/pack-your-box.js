@@ -83,6 +83,20 @@
  *                     cleared, YES enabled again. No thanks → #cfAR's action
  *                     + upsell=0 & purchase[product_id]=<base> #no-link, and
  *                     works even when YES can't. window.PYB.ctaMode.
+ *   v4 (2026-10-07) — ENGINE MODE: the base product is the order's MAIN
+ *                     product, posted as purchase[product_id] (a checked clone
+ *                     of CF's product-template radio); the box items stay in
+ *                     purchase[product_ids][]. v3 sent the base in
+ *                     product_ids[] and left purchase[product_id] empty, and
+ *                     CF answered "?declined=true&errors=Missing Purchase"
+ *                     with its "card declined" modal (first live 3.1 test,
+ *                     13644952 / 99131294 — no charge was attempted). The CF
+ *                     editor's own labels for this action are "1-Click-Upsell
+ *                     - %s" (one product); its card-retry code resubmits the
+ *                     #cfAR purchase[product_id] radio. The base is never in
+ *                     both fields; if CF's form already holds it as the main
+ *                     product it isn't added again. Native mode unchanged.
+ *                     (Copy: _archive/pack-your-box_v3.js.)
  * ========================================================================== */
 
 (function () {
@@ -503,6 +517,35 @@
     hidden.type = "hidden"; hidden.name = "purchase[product_ids][]"; hidden.value = id; hidden.setAttribute("data-pyb-appended", "1");
     return hidden;
   }
+  // The order's MAIN product (engine mode, v4): CF's 1-click upsell is keyed on purchase[product_id]; the
+  // product_ids[] are extras on top of it. A clone of CF's template row with its radio set, its checkbox removed.
+  function buildMain(id) {
+    if (TEMPLATE_HTML) {
+      var wrap = document.createElement("div"); wrap.innerHTML = TEMPLATE_HTML;
+      var node = wrap.firstElementChild, radio = node.querySelector('[name="purchase[product_id]"]');
+      if (radio) {
+        var extras = node.querySelectorAll('[name="purchase[product_ids][]"]');
+        for (var i = 0; i < extras.length; i++) { extras[i].parentNode.removeChild(extras[i]); }
+        radio.value = id; radio.checked = true; radio.disabled = false; radio.setAttribute("checked", "checked");
+        node.setAttribute("data-pyb-appended", "1"); node.setAttribute("data-pyb-main", "1"); node.removeAttribute("data-cf-product-template");
+        return node;
+      }
+    }
+    var hidden = document.createElement("input");
+    hidden.type = "hidden"; hidden.name = "purchase[product_id]"; hidden.value = id; hidden.setAttribute("data-pyb-appended", "1"); hidden.setAttribute("data-pyb-main", "1");
+    return hidden;
+  }
+  // CF's own main-product field, if it carries one (not ours, enabled, checked when a radio): its value, else "".
+  function formMain(form) {
+    var els = form.querySelectorAll('[name="purchase[product_id]"]');
+    for (var i = 0; i < els.length; i++) {
+      var e = els[i];
+      if (e.disabled || e.closest("[data-pyb-appended]") || e.hasAttribute("data-pyb-appended")) { continue; }
+      if ((e.type === "checkbox" || e.type === "radio") && !e.checked) { continue; }
+      if (String(e.value)) { return String(e.value); }
+    }
+    return "";
+  }
   // Is this id already an enabled product field in the form (not one of ours)?
   function formHas(form, id) {
     var els = form.querySelectorAll('[name="purchase[product_ids][]"], [name="purchase[product_id]"]');
@@ -520,11 +563,16 @@
     for (var i = 0; i < old.length; i++) { old[i].parentNode.removeChild(old[i]); }
     var ids = Object.keys(SELECTED), added = [];
     for (var j = 0; j < ids.length; j++) { if (BY_ID[ids[j]] && available(BY_ID[ids[j]])) { form.appendChild(buildInput(ids[j])); added.push(ids[j]); } }
-    // Engine mode: the base product goes with the items (never alone), unless the form already holds it.
+    // Engine mode: the base product is the order's MAIN product, purchase[product_id] (v4), sent with the items
+    // (never alone) and never also as an extra. If CF's form already names it as the main product, it isn't added.
     var mode = window.PYB.ctaMode = ctaMode(), baseNote = "";
     if (mode === "engine" && added.length && /^\d+$/.test(String(BASE.productID || ""))) {
-      if (formHas(form, String(BASE.productID))) { baseNote = " — base " + BASE.productID + " already in the form, not added again"; }
-      else { form.appendChild(buildInput(String(BASE.productID))); baseNote = " + base " + BASE.productID; }
+      var bid = String(BASE.productID), main = formMain(form);
+      if (main === bid) { baseNote = " — base " + bid + " already the form's main product, not added again"; }
+      else {
+        if (main) { warn("CF's form already names product " + main + " as the main product; the base " + bid + " replaces it."); }
+        form.appendChild(buildMain(bid)); baseNote = " + base " + bid + " as the main product (purchase[product_id])";
+      }
     }
     if (ACCEPT && !ACCEPT.done) { ACCEPT.submitted = true; ACCEPT.done = true; }
     log("submit (" + mode + " mode) — appending " + added.length + " product id(s):", (added.join(", ") || "(none)") + baseNote);
