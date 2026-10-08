@@ -97,6 +97,22 @@
  *                     both fields; if CF's form already holds it as the main
  *                     product it isn't added again. Native mode unchanged.
  *                     (Copy: _archive/pack-your-box_v3.js.)
+ *   v5 (2026-10-07) — ENGINE MODE: YES now goes through CF's own [data-upsell]
+ *                     handler, like a native button. v4 still got "Missing
+ *                     Purchase" live. The session probe on a working native
+ *                     page (Source Data/PYB3_ProbeReport_13644952_99131294_
+ *                     2026-10-07_v1.md) showed that the real button is
+ *                     <a href="#yes-link-multi-<id>" data-upsell="1"
+ *                     data-purchase='{"product_id":"<id>"}'>. lander.js's
+ *                     delegated [data-upsell] handler appends hidden
+ *                     purchase[product_id]=<id> AND upsell=1 to #cfAR before
+ *                     the #yes-link handler submits. upsell=1 is what v3/v4
+ *                     never sent. The engine's hidden link now carries the same
+ *                     three attributes, so CF adds its own fields. If that
+ *                     handler isn't on the page, the engine adds both fields
+ *                     at submit. Leftover fields from an earlier failed click
+ *                     are removed first. Items stay purchase[product_ids][].
+ *                     (Copy: _archive/pack-your-box_v4.js.)
  * ========================================================================== */
 
 (function () {
@@ -424,6 +440,16 @@
     return null;
   }
   var ACCEPT = null;   // engine-mode accept in flight: { at, submitted }
+  // Hidden purchase[product_id] / upsell fields that CF's [data-upsell] handler appended on an earlier click (a retry
+  // after a failed submit would otherwise post them twice). CF's own template row is not a direct hidden child.
+  function clearUpsellFields() {
+    var form = document.querySelector("#cfAR"); if (!form) { return; }
+    var els = form.querySelectorAll(':scope > input[type="hidden"][name="upsell"], :scope > input[type="hidden"][name="purchase[product_id]"]');
+    for (var i = 0; i < els.length; i++) { els[i].parentNode.removeChild(els[i]); }
+  }
+  function hiddenField(name, value) {
+    var h = document.createElement("input"); h.type = "hidden"; h.name = name; h.value = value; h.setAttribute("data-pyb-appended", "1"); return h;
+  }
   function stepUrl() { return String(location.href).split("#")[0]; }
   function acceptEngine(yes) {
     var why = engineProblem();
@@ -434,12 +460,16 @@
     }
     if (ACCEPT && !ACCEPT.done) { return false; }
     ACCEPT = { at: Date.now(), submitted: false, done: false };
-    var a = document.createElement("a");
-    a.href = stepUrl() + "#yes-link"; a.setAttribute("data-pyb-native", "yes"); a.setAttribute("aria-hidden", "true");
+    // v5: the same link CF renders for a native 1-click-upsell button. CF's delegated [data-upsell] handler reads
+    // data-purchase and appends purchase[product_id] + upsell=1 to #cfAR; then its #yes-link handler submits.
+    clearUpsellFields();
+    var bid = String(BASE.productID), a = document.createElement("a");
+    a.href = stepUrl() + "#yes-link-multi-" + bid; a.setAttribute("data-pyb-native", "yes"); a.setAttribute("aria-hidden", "true");
+    a.setAttribute("data-upsell", "1"); a.setAttribute("data-purchase", JSON.stringify({ product_id: bid }));
     a.style.display = "none"; a.textContent = "yes";
     (document.querySelector(".pyb") || document.body).appendChild(a);
     loading(true);
-    log("YES (engine mode) — submitting through ClickFunnels' #yes-link handler.");
+    log("YES (engine mode) — submitting through ClickFunnels' [data-upsell] + #yes-link handlers (purchase[product_id] " + bid + ", upsell=1).");
     a.click();
     setTimeout(function () { try { a.parentNode.removeChild(a); } catch (e) {} }, 10000);
     var mine = ACCEPT;
@@ -568,11 +598,15 @@
     var mode = window.PYB.ctaMode = ctaMode(), baseNote = "";
     if (mode === "engine" && added.length && /^\d+$/.test(String(BASE.productID || ""))) {
       var bid = String(BASE.productID), main = formMain(form);
-      if (main === bid) { baseNote = " — base " + bid + " already the form's main product, not added again"; }
+      // v5: normally CF's [data-upsell] handler has just appended purchase[product_id]=<base> and upsell=1 (from the
+      // link's data-purchase / data-upsell). Only if it didn't (handler missing) does the engine add them.
+      if (main === bid) { baseNote = " + base " + bid + " (purchase[product_id], added by ClickFunnels)"; }
       else {
         if (main) { warn("CF's form already names product " + main + " as the main product; the base " + bid + " replaces it."); }
-        form.appendChild(buildMain(bid)); baseNote = " + base " + bid + " as the main product (purchase[product_id])";
+        form.appendChild(buildMain(bid)); baseNote = " + base " + bid + " (purchase[product_id], added by the engine — CF's [data-upsell] handler didn't)";
       }
+      if (!form.querySelector('[name="upsell"]')) { form.appendChild(hiddenField("upsell", "1")); baseNote += " + upsell=1 (added by the engine)"; }
+      else { baseNote += " + upsell=1"; }
     }
     if (ACCEPT && !ACCEPT.done) { ACCEPT.submitted = true; ACCEPT.done = true; }
     log("submit (" + mode + " mode) — appending " + added.length + " product id(s):", (added.join(", ") || "(none)") + baseNote);
