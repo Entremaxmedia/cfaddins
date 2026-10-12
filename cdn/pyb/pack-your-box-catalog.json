@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "updated": "2026-10-02",
+  "updated": "2026-10-12",
   "note": "Pack Your Box 3.0 MASTER CATALOG — one record per ClickFunnels product (cfName is the join key: unique, never renamed once a step carries it) and the VERSIONS (Standard / Trump / 1st Hour / …), each an ordered list of product keys plus its skin, base product and page copy. No product ids: ids are per funnel step and live in each step's footer. Edit in the Catalog Workbench (Catalog mode), then publish with Scripts/publish_pyb_v1.mjs.",
   "products": [
     {
@@ -971,11 +971,11 @@
       "blurb": "A dedicated, grab-and-go kit built for severe bleeding: one-arm tourniquet kit, tourniquet, chest seal, compressed gauze and trauma bandage. Keep it in the car or range bag — wherever your main kit isn't.",
       "retail": 106.85,
       "price": 29.95,
-      "img": "https://images.clickfunnels.com/cdn-cgi/image/fit=scale-down,width=800,quality=80,format=auto/https://mtp-images.com/pr-photo-6511.png",
+      "img": "https://mtp-images.com/pr-photo-6511.png",
       "article": null,
       "sku": "RBK",
       "note": "unknown — check the inventory tool",
-      "pricing": "Same as the RBK OTO; the anchor is the sum of the parts on the RBK sales page. Product exists on dev step 99102863.",
+      "pricing": "Same as the RBK OTO; the anchor is the sum of the parts on the RBK sales page. Product exists on dev step 99102863. Image is the direct mtp-images.com URL: CF rewrites images.clickfunnels.com resizer URLs even inside Footer Code JS (to //<domain>/hosted/images/..., which 404s and isn't https), so the engine dropped this card live (2026-10-12).",
       "source": "Upsells/1st Hour/Rapid Bleed Kit/1 Rapid Bleed Kit Upsell/1HT_RapidBleedKitUpsell_v2.html"
     },
     {
@@ -1020,7 +1020,7 @@
       "article": null,
       "sku": "T-151",
       "note": "100 units on hand (inventory tool, 2026-09-27) — a 25-pack draws 25 per order, so four orders empty it",
-      "pricing": "Same as the 25 Alcohol Pads OTO ($9.99 / $49.75, an estimate). Not yet a CF product.",
+      "pricing": "Same as the 25 Alcohol Pads OTO ($9.99 / $49.75, an estimate), live at $9.99 on 13688167. CF product on dev step 99102863 (2026-10-12).",
       "source": "Upsells/1st Hour/Alcohol Pads/25 Alcohol Pads Upsell/1HT_AlcoholPad25PackUpsell_v1.html"
     },
     {
@@ -1050,7 +1050,7 @@
       "article": null,
       "sku": null,
       "note": "unknown — no SKU recorded in the workspace; check the inventory tool",
-      "pricing": "Same as the 1x Wound Closure Kit OTO ($14.99 / $35). That OTO includes a free non-adherent pad; this card does not promise one. Not yet a CF product.",
+      "pricing": "Same as the 1x Wound Closure Kit OTO ($14.99 / $35), live at $14.99 on 13688167. That OTO includes a free non-adherent pad; this card does not promise one. CF product on dev step 99102863 (2026-10-12). Image is the direct mtp-images.com URL: CF rewrites images.clickfunnels.com resizer URLs even inside Footer Code JS (to //<domain>/hosted/images/..., which 404s and isn't https), so the engine dropped this card live (2026-10-12).",
       "source": "Upsells/1st Hour/Wound Closure Kit/1 Wound Closure Kit Upsell/1HT_WoundClosureKit1PackUpsell_v1.html"
     },
     {
@@ -1067,6 +1067,36 @@
       "note": "unknown — check the inventory tool",
       "pricing": "Same as the 1x Tourniquet Kit OTO ($14.95 / $30.00, from the RBK sales page). The price list had pencilled $19.95 / $39.95 before that page existed. Not yet a CF product; its clips are still pending from Keith.",
       "source": "Upsells/1st Hour/One Arm Tourniquet Kit/1 Tourniquet Kit Upsell/_archive/1HT_TourniquetKit1PackUpsell_v1.html"
+    },
+    {
+      "key": "trauma-pack",
+      "cfName": "1st Hour Trauma Pack",
+      "title": "Trauma Pack",
+      "name": "1st Hour Trauma Pack",
+      "blurb": "The bleeding-control essentials in one compact, sealed pouch: a tourniquet, a 6-inch Israeli emergency bandage, 2 compressed gauze, zip wound closures (3-pack) and a marker for noting the time. Keep it in the car, at work or in the bag — wherever your main kit isn't.",
+      "retail": 59.95,
+      "price": 29.95,
+      "img": "https://mtp-images.com/pr-traumapackreal-photo-005.webp",
+      "article": null,
+      "sku": "T-163",
+      "note": "in stock per Keith 2026-10-02 (no count); selling on 13688167 since early October",
+      "pricing": "Same as the 1x Trauma Pack OTO ($29.95 / $59.95, an estimate), live at $29.95 on 13688167. CF product on dev step 99102863 (2026-10-12).",
+      "source": "Upsells/1st Hour/Trauma Pack/1 Trauma Pack Upsell/1HT_TraumaPack1PackUpsell_v3.html"
+    },
+    {
+      "key": "trauma-shears",
+      "cfName": "1st Hour Trauma Shears",
+      "title": "Trauma Shears",
+      "name": "1st Hour Trauma Shears",
+      "blurb": "EMT-style trauma shears with a blunt, rounded tip that slides under a sleeve or pant leg, a serrated lower blade, and bright red 1st Hour handles you can spot in a full drawer. A second pair for the kitchen, the desk or the truck.",
+      "retail": 11.99,
+      "price": 6.99,
+      "img": "https://mtp-images.com/pr-scissorsreal-photo-001.webp",
+      "article": null,
+      "sku": "T-145",
+      "note": "selling on 13688167 (1st Hour Trauma Shears OTO); no count recorded",
+      "pricing": "$6.99 = the 1st Hour PYB per-card floor, above the $5.99 1x OTO live on 13688167 (Keith confirmed 2026-10-12). $11.99 anchor is that OTO page's estimate. Blade length never stated. CF product on dev step 99102863 (2026-10-12).",
+      "source": "Upsells/1st Hour/Scissors/1 Pair of Scissors Upsell/1HT_Scissors1PackUpsell_v1.html"
     }
   ],
   "versions": [
@@ -1201,7 +1231,7 @@
       "folder": "1st Hour Pack Your Box",
       "template": "",
       "templateNote": "no 3.0 page template saved yet",
-      "note": "Nine entries match the products already on dev step 99102863 (Upsell Template Funnel 13644952) by name and price. The others are proposals from each product's own upsell page.",
+      "note": "2026-10-12: order and the first nine follow what the 1st Hour Trauma Kit funnel (13688167) sells, by earnings per page view (Keith's Oct 1-12 stats). All 14 except Gauze Pad, CPR Car Kit and Tourniquet Kit are CF products on dev step 99102863 (Upsell Template Funnel 13644952); Burn Pack, Burn Dressing, Space Blanket and Chest Seal are switched OFF on that step (not sold yet). defaultOff (2026-10-12, Keith): the 7 not being sold start OFF on a new step (built-in configuration and new steps); switch one on in the workbench to sell it.",
       "copy": {
         "ribbon": "⚠ Wait — your order isn’t complete yet ⚠",
         "eyebrow": "One-Time Offer · This Page Only",
@@ -1215,19 +1245,30 @@
         "trust": "🔒 Secure One-Click Checkout\n📦 Ships With Your Order\n🛡️ Same Guarantee As Your Order"
       },
       "products": [
-        "burn-pack",
-        "burn-dressing",
-        "triangular-bandage",
+        "wound-closure-kit",
+        "rapid-bleed-kit",
+        "trauma-pack",
         "adhesive-wound-dressing",
         "splint",
+        "triangular-bandage",
         "medical-tape",
+        "trauma-shears",
+        "alcohol-pads",
+        "burn-pack",
+        "burn-dressing",
         "gold-space-blanket",
-        "rapid-bleed-kit",
         "chest-seal",
         "gauze-pad",
-        "alcohol-pads",
         "1sthour-cpr-car-kit",
-        "wound-closure-kit",
+        "tourniquet-kit"
+      ],
+      "defaultOff": [
+        "burn-pack",
+        "burn-dressing",
+        "gold-space-blanket",
+        "chest-seal",
+        "gauze-pad",
+        "1sthour-cpr-car-kit",
         "tourniquet-kit"
       ]
     }

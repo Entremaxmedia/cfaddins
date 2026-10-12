@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "updated": "2026-10-02",
+  "updated": "2026-10-12",
   "note": "Pack Your Box 3.0 stock statuses — one per product, keyed by CF product name (cfName), shared by every version and funnel. Statuses: in-stock | low-stock | sold-out | discontinued. Live pages read this file from the CDN on load and it can only change a status. Edit in the Catalog Workbench (Manage stock), then publish with Scripts/publish_pyb_v1.mjs.",
   "products": {
     "Solar Charger": "in-stock",
@@ -73,6 +73,8 @@
     "1st Hour Alcohol Pads (25-Pack)": "in-stock",
     "1st Hour CPR Car Kit": "in-stock",
     "1st Hour Wound Closure Kit": "in-stock",
-    "1st Hour Tourniquet Kit": "in-stock"
+    "1st Hour Tourniquet Kit": "in-stock",
+    "1st Hour Trauma Pack": "in-stock",
+    "1st Hour Trauma Shears": "in-stock"
   }
 }
