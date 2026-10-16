@@ -117,6 +117,20 @@ BumpSelector.setState(state)           // Restore saved state
 
 ---
 
+<!-- protocols:start -->
+## 🩹 1st Hour Protocols Upsell (`cdn/protocols/`)
+
+The 15-book Protocols OTO. The page holds one fixed mount element; the step's **Footer Code** sets `window.P3_CONFIG` (the step's 16 product ids) and loads the engine below, which draws the whole ordering section. Generated per step by the Team Hub Protocols workbench. Details: [protocols/README.md](protocols/README.md).
+
+| Version | File | Status |
+|---|---|---|
+| 3.1.0 | [`1st-hour-protocols-v3.1.0.js`](https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/protocols/1st-hour-protocols-v3.1.0.js) | **current** |
+
+Source, build and SOP: acelib `Upsells/1st Hour/Protocols Upsell/`. Versioned files are never edited; a change is a new version.
+<!-- protocols:end -->
+
+---
+
 ## 🎯 Quick Navigation
 
 | Need | Go To |
