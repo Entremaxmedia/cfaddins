@@ -54,6 +54,22 @@ Overview of what changed and why.
 
 ---
 
+## 🪧 Sales banner loader
+
+**Current:** `sales-banner-v1.0.0.js` (2026-11-17). Loads the brand's live sales banner from the Team Hub
+(`/banner/<brand>.js`); the banners are designed and switched on in the hub's `/banners` page, which also gives the
+snippets. Use it in a funnel's Tracking Code:
+
+```html
+<script async src="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/sales-banner-v1.0.0.js" data-brand="mytacticalpromos"></script>
+```
+
+| Version | Date | What changed |
+|---|---|---|
+| v1.0.0 | 2026-11-17 | First version. |
+
+---
+
 ## 📦 Source Files
 
 ### Core Engine
