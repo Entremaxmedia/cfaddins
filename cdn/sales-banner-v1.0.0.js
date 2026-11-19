@@ -20,10 +20,12 @@
  *
  * REVISION HISTORY
  *   v1.0.0 (2026-11-17, Alec + Claude): first version.
+ *   v1.0.0 (2026-11-19, Alec + Claude): the hub moved to optimize.entremaxhq.com (the Railway address still works).
+ *     Same file name on purpose, so every snippet already pasted picks this up.
  * ========================================================================== */
 (function () {
   'use strict';
-  var HUB = 'https://web-production-382d7ab6.up.railway.app';
+  var HUB = 'https://optimize.entremaxhq.com';
   var me = document.currentScript;
   if (!me) { // very old browsers: the last loader tag on the page
     var tags = document.querySelectorAll('script[src*="sales-banner-v"]');
