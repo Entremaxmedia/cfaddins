@@ -147,6 +147,20 @@ Source, build and SOP: acelib `Upsells/1st Hour/Protocols Upsell/`. Versioned fi
 
 ---
 
+## 🧾 Other Order-Form Scripts
+
+### `cc-exp-formatter-v1.0.0.js` — Card expiry auto-format (EasyPayDirect) — added Nov 23, 2026
+CF's `lander.js` only formats the card expiry box on **Recurly** forms. On **EasyPayDirect** nothing inserts the "/", but CF splits the value on "/" at submit, so a customer who types `630` is declined. This script formats `input[name="purchase[credit_card_exp_date_month_year]"]` as `MM/YY` while typing and normalizes on blur/submit (`630`, `0630`, `6/30`, `06/2030` → `06/30`). It does nothing on Recurly or Stripe forms and nothing if loaded twice.
+
+Footer Code, right after Phone-Validation:
+```html
+<!-- Card expiry auto-format (EasyPayDirect) -->
+<script src="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/cc-exp-formatter-v1.0.0.js"></script>
+```
+Source, tests and the read-only audit script: acelib `Snippets/cc-exp-formatter/`.
+
+---
+
 ## 🎯 Quick Navigation
 
 | Need | Go To |
