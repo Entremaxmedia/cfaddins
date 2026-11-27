@@ -70,6 +70,34 @@ snippets. Use it in a funnel's Tracking Code:
 
 ---
 
+## 🎁 Bonus row (free bonus on an order form)
+
+**Current:** `bonus-row-v1.0.0.js` (2026-11-27). Shows a free **bonus** (e.g. "FREE $50 Mystery Gift + $25 Gift Card
+in every order") on a CF Classic order form: an extra pre-selected, locked line under the product rows with its bonus
+items side by side (picture / name / crossed-out value), and a FREE line in the order summary. **Display only**: it
+never touches the form's inputs or totals. **Tied to the sales banner** above: shown only while the brand's banner is
+live and the hub's daily count (`/banner/count/<brand>`, checked every 15 s) isn't reached; it disappears when the
+banner sells out. One bonus per page.
+
+Install = the page's **Footer Code**, settings `<div>` first, then the script. Don't hand-write the `<div>`: every
+bonus has a ready snippet in acelib, `Bonuses/<slug>/Paste/<slug>_Bonus_v<N>_CDN.html`.
+
+```html
+<!-- <slug>_Bonus_v<N>_CDN.html -->
+<div data-emx-sale-gift data-bonus="<slug>" data-brand="1sthour" data-items='[…]' … style="display:none"></div>
+<script src="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/bonus-row-v1.0.0.js" defer></script>
+```
+
+The page must also load the sales banner (funnel head code) with the same `data-brand`. Settings, the bonus library,
+installing on another form, and testing: acelib `Bonuses/README.md` (catalog: `Bonuses/CATALOG.md`). Source of
+truth: acelib `Bonuses/_engine/emx-bonus-row.js` (this file = engine e6 + a header).
+
+| Version | Date | What changed |
+|---|---|---|
+| v1.0.0 | 2026-11-27 | First version (engine e6). |
+
+---
+
 ## 📦 Source Files
 
 ### Core Engine
