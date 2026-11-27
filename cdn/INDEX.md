@@ -72,7 +72,7 @@ snippets. Use it in a funnel's Tracking Code:
 
 ## 🎁 Bonus row (free bonus on an order form)
 
-**Current:** `bonus-row-v1.0.0.js` (2026-11-27). Shows a free **bonus** (e.g. "FREE $50 Mystery Gift + $25 Gift Card
+**Current:** `bonus-row-v1.0.1.js` (2026-11-27). Shows a free **bonus** (e.g. "FREE $50 Mystery Gift + $25 Gift Card
 in every order") on a CF Classic order form: an extra pre-selected, locked line under the product rows with its bonus
 items side by side (picture / name / crossed-out value), and a FREE line in the order summary. **Display only**: it
 never touches the form's inputs or totals. **Tied to the sales banner** above: shown only while the brand's banner is
@@ -85,16 +85,17 @@ bonus has a ready snippet in acelib, `Bonuses/<slug>/Paste/<slug>_Bonus_v<N>_CDN
 ```html
 <!-- <slug>_Bonus_v<N>_CDN.html -->
 <div data-emx-sale-gift data-bonus="<slug>" data-brand="1sthour" data-items='[…]' … style="display:none"></div>
-<script src="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/bonus-row-v1.0.0.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/entremaxmedia/cfaddins@main/cdn/bonus-row-v1.0.1.js" defer></script>
 ```
 
 The page must also load the sales banner (funnel head code) with the same `data-brand`. Settings, the bonus library,
 installing on another form, and testing: acelib `Bonuses/README.md` (catalog: `Bonuses/CATALOG.md`). Source of
-truth: acelib `Bonuses/_engine/emx-bonus-row.js` (this file = engine e6 + a header).
+truth: acelib `Bonuses/_engine/emx-bonus-row.js` (each file = an engine version + a header).
 
 | Version | Date | What changed |
 |---|---|---|
-| v1.0.0 | 2026-11-27 | First version (engine e6). |
+| v1.0.1 | 2026-11-27 | Engine e7: the order-summary line no longer flickers when the order-form enhancer rebuilds the summary (every counter update / kit switch). Use this one. |
+| v1.0.0 | 2026-11-27 | First version (engine e6). Its summary line blinks off briefly on each summary rebuild: move pages to v1.0.1. |
 
 ---
 
